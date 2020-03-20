@@ -10,7 +10,7 @@ class SketchList2D : public FXApp {
 	friend class TestWindow;
 
 protected:
-	TestWindowList  windowlist;                   // Window list
+	FX::FXObjectListOf<TestWindow> windowlist;    //Window list
 	FXFileDict     *associations;                 // File association table
 
 private:

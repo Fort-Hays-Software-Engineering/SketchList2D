@@ -1,3 +1,4 @@
+#include <cmath>
 #include "fx.h"
 #include "fxkeys.h"
 #include <new>

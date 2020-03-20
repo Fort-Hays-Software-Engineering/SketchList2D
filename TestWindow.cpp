@@ -23,7 +23,7 @@ FXDEFMAP(TestWindow) TestWindowMap[] = {
 
 FXIMPLEMENT(TestWindow, FXMainWindow, TestWindowMap, ARRAYNUMBER(TestWindowMap))
 
-TestWindow::TestWindow(SketchList2D* a, const FXString* file) {}: FXMainWindow(a, "SketchList2D", NULL, NULL, DECOR_ALL, 0, 0, 800, 600, 0, 0), mrufiles(a) {
+TestWindow::TestWindow(SketchList2D* a, const FXString* file) : FXMainWindow(a, "SketchList2D", NULL, NULL, DECOR_ALL, 0, 0, 800, 600, 0, 0) {
 	getApp()->windowlist.append(this);
 	
 	filemenu = new FXMenuPane(this);
@@ -84,7 +84,7 @@ long TestWindow::onCmdOpen(FXObject*, FXSelector, void*) {
 		FXString file = opendialog.getFilename();
 		TestWindow *window = findWindow(file);
 		if (!window) {
-			window = findUnused();
+			//window = findUnused();
 			if (!window) {
 				window = new TestWindow(getApp(), unique());
 				window->create();

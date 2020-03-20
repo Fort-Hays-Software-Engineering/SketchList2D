@@ -17,6 +17,7 @@ protected:
 private:
 	TestWindow() {}
 	TestWindow(const TestWindow&);
+	TestWindow(SketchList2D* a, const FXString* file);
 	//TestWindow& operator=(const TestWindow&);
 
 protected:
@@ -44,7 +45,7 @@ public:
 	SketchList2D* getApp() const { return (SketchList2D*)FXMainWindow::getApp(); }
 	const FXString& getFilename() const { return filename; }
 
-	virtual ~TextWindow();
+	virtual ~TestWindow();
 };
 
 
