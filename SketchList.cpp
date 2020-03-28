@@ -54,8 +54,10 @@ SketchWindow::SketchWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D", NULL, NUL
 	// Button to clear
 	new FXButton(buttonFrame, "&Clear", NULL, this, ID_CLEAR, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
 
+	new FXButton(buttonFrame, "&New", NULL, this, ID_NEW, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
+
 	// Exit button
-	new FXButton(buttonFrame, "&Exit", NULL, getApp(), FXApp::ID_QUIT, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
+	new FXButton(buttonFrame, "&Exit", NULL, this, FXApp::ID_QUIT, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
 
 	// RIGHT pane to contain the canvas
 	canvasFrame = new FXVerticalFrame(contents, FRAME_SUNKEN | LAYOUT_FILL_X | LAYOUT_FILL_Y | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 10, 10);
@@ -177,6 +179,15 @@ long SketchWindow::onCmdClear(FXObject*, FXSelector, void*) {
 	return 1;
 }
 
+// New
+long SketchWindow::onCmdNew(FXObject*, FXSelector, void*) {
+	SketchWindow *window = new SketchWindow();
+	window->create();
+	window->raise();
+	window->setFocus();
+	return 1;
+}
+
 // ------------------- New File Code --------------------- // 
 //    Taken From Adie, still missing getapp->windowlist    //
 
@@ -198,14 +209,7 @@ SketchWindow *SketchWindow::findWindow(const FXString& file) const {
 	return NULL;
 }
 
-// New
-long SketchWindow::onCmdNew(FXObject*, FXSelector, void*) {
-	SketchWindow *window = new SketchWindow(getApp(), unique());
-	window->create();
-	window->raise();
-	window->setFocus();
-	return 1;
-}*/
+*/
 
 
 // Open file code from adie ---- not yet adapted
@@ -253,6 +257,18 @@ long SketchWindow::onUpdClear(FXObject* sender, FXSelector, void*) {
 		sender->handle(this, FXSEL(SEL_COMMAND, FXWindow::ID_DISABLE), NULL);
 
 	return 1;
+}
+
+FXbool SketchWindow::close(FXbool notify) {
+	// Perform normal close stuff
+	return FXMainWindow::close(notify);
+}
+
+// Detach window
+void SketchWindow::detach() {
+	FXMainWindow::detach();
+	dragshell1->detach();
+	urilistType = 0;
 }
 
 

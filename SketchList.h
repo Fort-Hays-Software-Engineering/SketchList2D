@@ -8,6 +8,7 @@
 
 #include "fx.h"
 
+class NewWindow;
 
 
 // Main Window
@@ -37,6 +38,7 @@ protected:
 protected:
 	FXString unique() const;
 	SketchWindow *findWindow(const FXString& file) const;
+	FXIcon *newicon;
 public:
 
 	// Message handlers
@@ -69,6 +71,11 @@ public:
 
 	// Initialize
 	virtual void create();
+
+	virtual void detach();
+	// Close the window, return TRUE if actually closed
+	virtual FXbool close(FXbool notify = FALSE);
+	SketchWindow* getApp() const { return (SketchWindow*)FXMainWindow::getApp(); }
 
 	virtual ~SketchWindow();
 };
