@@ -1,10 +1,10 @@
 
 /********************************************************************************
 *                                                                               *
-*                         SketchList 2D GUI Code                                *
+*                         SplashList 2D GUI Code                                *
 *                                                                               *
 ********************************************************************************/
-#ifndef SKETCHLIST_H
+#ifndef SPLASHWINDOW_H
 
 #include "fx.h"
 
@@ -12,23 +12,21 @@ class NewWindow;
 
 
 // Main Window
-class SketchWindow : public FXMainWindow {
+class SplashWindow : public FXMainWindow {
 
 	// Macro for class hierarchy declarations
-	FXDECLARE(SketchWindow)
+	FXDECLARE(SplashWindow)
 
 private:
 
 	FXHorizontalFrame *contents;                // Content frame
-	FXVerticalFrame   *canvasFrame;             // Canvas frame
-	FXVerticalFrame   *buttonFrame;             // Button frame
-	FXCanvas          *canvas;                  // Canvas to draw into
-	int                mdflag;                  // Mouse button down?
-	int                dirty;                   // Canvas has been painted?
-	FXColor            drawColor;               // Color for the line
+	FXHorizontalFrame *middleSplashFrame;       // Middle pane of the splash screen
+	FXVerticalFrame   *createNewProjectFrame;   // Create New Project label and button
+	FXVerticalFrame   *loadProjectFrame;        // Splash screen load new project frame
+	FXHorizontalFrame *existingProjectList;     // Horizontal frame for exiting project list
 
 protected:
-	SketchWindow() {}
+	SplashWindow() {}
 	FXMenuPane          *filemenu;                // File menu
 	FXMenuBar           *menubar;                 // Menu bar
 	FXStatusBar         *statusbar;               // Status bar
@@ -37,21 +35,15 @@ protected:
 
 protected:
 	FXString unique() const;
-	SketchWindow *findWindow(const FXString& file) const;
+	SplashWindow *findWindow(const FXString& file) const;
 	FXIcon *newicon;
 public:
 
-	// Message handlers
-	long onPaint(FXObject*, FXSelector, void*);
-	long onMouseDown(FXObject*, FXSelector, void*);
-	long onMouseUp(FXObject*, FXSelector, void*);
-	long onMouseMove(FXObject*, FXSelector, void*);
-	long onCmdClear(FXObject*, FXSelector, void*);
-	long onUpdClear(FXObject*, FXSelector, void*);
+	//create a new project
+	long onCmdNewProject(FXObject*, FXSelector, void*);
 
-	// File Management Message Handlers
-	long onCmdNew(FXObject*, FXSelector, void*);
-	long onCmdOpen(FXObject*, FXSelector, void*);
+	FXApp* getApp() const { return (FXApp*)FXMainWindow::getApp(); }
+
 
 public:
 
@@ -61,13 +53,14 @@ public:
 		ID_CLEAR,
 		ID_NEW,
 		ID_OPEN,
+		ID_NEWPROJECT,
 		ID_LAST
 	};
 
 public:
 
-	// SketchWindow's constructor
-	SketchWindow(FXApp* a);
+	// SplashWindow's constructor
+	SplashWindow(FXApp* a);
 
 	// Initialize
 	virtual void create();
@@ -75,8 +68,8 @@ public:
 	virtual void detach();
 	// Close the window, return TRUE if actually closed
 	virtual FXbool close(FXbool notify = FALSE);
-	SketchWindow* getApp() const { return (SketchWindow*)FXMainWindow::getApp(); }
+	//SplashWindow* getApp() const { return (SplashWindow*)FXMainWindow::getApp(); }
 
-	virtual ~SketchWindow();
+	virtual ~SplashWindow();
 };
-#endif // !SKETCHLIST_H
+#endif // !SPLASHWINDOW_H
