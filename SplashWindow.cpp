@@ -3,7 +3,7 @@
 *                         SplashList 2D GUI Code                                *
 *                                                                               *
 ********************************************************************************/
-#include "SketchList.h"
+#include "SplashWindow.h"
 #include "ProjectWindow.h"
 #include "fx.h"
 

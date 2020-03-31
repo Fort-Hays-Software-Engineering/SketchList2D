@@ -1,4 +1,4 @@
-#include "SketchList.h"
+#include "SplashWindow.h"
 #include "Project.h"
 #include "fx.h"
 
