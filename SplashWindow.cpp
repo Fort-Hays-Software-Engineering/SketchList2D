@@ -53,8 +53,10 @@ SplashWindow::SplashWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Design
 	new FXMenuTitle(menubar, tr("&File"), NULL, filemenu);
 
 	// File Menu entries
-	new FXMenuCommand(filemenu, tr("&New...\tCtl-N\tCreate new document."), NULL, this, ID_NEW);
-	new FXMenuCommand(filemenu, tr("&Open...\tCtl-O\tOpen document file."), NULL, this, ID_OPEN);
+	new FXMenuCommand(filemenu, tr("&New Project...\tCtl-N\tCreate new document."), NULL, this, ID_NEWPROJECT);
+	new FXMenuCommand(filemenu, tr("&Open Project...\tCtl-O\tOpen document file."), NULL, this, ID_OPEN);
+	new FXMenuSeparator(filemenu);
+	new FXMenuCommand(filemenu, tr("&Exit...\tAlt-F4\tExit Program."), NULL, this, FXApp::ID_QUIT);
 
 }
 

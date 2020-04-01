@@ -8,6 +8,7 @@
 #include "fx.h"
 #include "Project.h";
 
+
 class NewWindow;
 
 
@@ -56,6 +57,9 @@ protected:
 	FXStatusBar         *statusbar;               // Status bar
 	FXDockSite          *topdock;                 // Topmost dock area
 	FXToolBarShell      *dragshell1;              // Shell for floating menubar
+	FXString             filename;                // File being edited
+	FXbool               filenameset;             // Filename is set
+	FXTime               filetime;                // Time File was saved
 
 protected:
 	FXString unique() const;
@@ -74,6 +78,8 @@ public:
 	// File Management Message Handlers
 	long onCmdNew(FXObject*, FXSelector, void*);
 	long onCmdOpen(FXObject*, FXSelector, void*);
+	long onCmdSave(FXObject*, FXSelector, void*);
+	long onCmdSaveAs(FXObject*, FXSelector, void*);
 
 	//create a new project
 	long onCmdNewProject(FXObject*, FXSelector, void*);
@@ -88,7 +94,10 @@ public:
 		ID_CLEAR,
 		ID_NEW,
 		ID_OPEN,
+		ID_SAVE,
+		ID_SAVEAS,
 		ID_NEWPROJECT,
+		ID_VIEWBOM,
 		ID_LAST
 	};
 
@@ -104,6 +113,9 @@ public:
 	// Close the window, return TRUE if actually closed
 	virtual FXbool close(FXbool notify = FALSE);
 	//ProjectWindow* getApp() const { return (ProjectWindow*)FXMainWindow::getApp(); }
+
+	// Save text to file
+	FXbool saveFile(const FXString& file);
 
 	virtual ~ProjectWindow();
 };

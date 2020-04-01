@@ -1,7 +1,10 @@
 #include "ProjectWindow.h"
 #include <FXComboBox.h>
 #include <FXText.h>
+#include <FXGLCanvas.h>
+#include <FXGLVisual.h>
 #include <FXRadioButton.h>
+
 
 FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
 
@@ -12,8 +15,9 @@ FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
 	FXMAPFUNC(SEL_MOTION,            ProjectWindow::ID_CANVAS, ProjectWindow::onMouseMove),
 	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_CLEAR,  ProjectWindow::onCmdClear),
 	FXMAPFUNC(SEL_UPDATE,            ProjectWindow::ID_CLEAR,  ProjectWindow::onUpdClear),
-	//FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEW,    ProjectWindow::onCmdNew),
-	//FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_OPEN,   ProjectWindow::onCmdOpen),
+	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_OPEN,   ProjectWindow::onCmdOpen),
+	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_SAVE,   ProjectWindow::onCmdSave),
+	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_SAVEAS,   ProjectWindow::onCmdSaveAs),
 	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPROJECT,    ProjectWindow::onCmdNewProject),
 };
 
@@ -24,7 +28,7 @@ FXIMPLEMENT(ProjectWindow, FXMainWindow, ProjectWindowMap, ARRAYNUMBER(ProjectWi
 
 
 // Construct a ProjectWindow
-ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Romm Designer", NULL, NULL, DECOR_ALL, 0, 0, 800, 600) {
+ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Designer", NULL, NULL, DECOR_ALL, 0, 0, 800, 600) {
 	// Add to list of windows
 	//getApp()->windowlist.append(this);
 	project = new Project();
@@ -59,6 +63,9 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Romm Desi
 
 
 	canvas = new FXCanvas(contents, this, ID_CANVAS, FRAME_SUNKEN | FRAME_THICK | LAYOUT_FILL_X | LAYOUT_FILL_Y | LAYOUT_FILL_ROW | LAYOUT_FILL_COLUMN);
+
+
+	
 	//middleSplashFrame = new FXHorizontalFrame(contents, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 90, 0, 0, 0, 0, 0);
 
 		// LEFT pane for the buttons
@@ -101,14 +108,21 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Romm Desi
 	new FXMenuTitle(menubar, tr("&File"), NULL, filemenu);
 
 	// File Menu entries
-	new FXMenuCommand(filemenu, tr("&New...\tCtl-N\tCreate new document."), NULL, this, ID_NEW);
-	new FXMenuCommand(filemenu, tr("&Open...\tCtl-O\tOpen document file."), NULL, this, ID_OPEN);
-
+	new FXMenuCommand(filemenu, tr("&New Project...\tCtl-N\tCreate New Project."), NULL, this, ID_NEWPROJECT);
+	new FXMenuCommand(filemenu, tr("&Open Project...\tCtl-O\tOpen Project File."), NULL, this, ID_OPEN);
+	new FXMenuCommand(filemenu, tr("&Save Project...\tCtl-S\tSave Project."), NULL, this, ID_SAVE);
+	new FXMenuCommand(filemenu, tr("&Save Project As...\tCtl-D\tSave Project As."), NULL, this, ID_SAVEAS);
+	new FXMenuSeparator(filemenu);
+	new FXMenuCommand(filemenu, tr("&View Materials and Pricing\tCtl-B."), NULL, this, ID_VIEWBOM);
+	new FXMenuSeparator(filemenu);
+	new FXMenuCommand(filemenu, tr("&Exit\tAlt-F4\tExit Program."), NULL, this, FXApp::ID_QUIT);
 
 	// Initialize private variables
-	drawColor = FXRGB(255, 0, 0);
+	drawColor = FXRGB(207, 207, 207);
 	mdflag = 0;
 	dirty = 0;
+
+
 }
 
 void configurePlaceableComboBox(FXComboBox *comboBox) {
@@ -130,6 +144,9 @@ void ProjectWindow::create() {
 	filemenu->create();
 	// Make the main window appear
 	show(PLACEMENT_SCREEN);
+	
+
+
 }
 
 
@@ -148,11 +165,8 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void*) {
 
 // The mouse has moved, draw a line
 long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
-	FXEvent *ev = (FXEvent*)ptr;
 
-	// Draw
 	if (mdflag) {
-
 		// Get DC for the canvas
 		FXDCWindow dc(canvas);
 
@@ -160,11 +174,20 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 		dc.setForeground(drawColor);
 
 		// Draw line
-		dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
+		//dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
+		int canvasWidth = canvas->getWidth();
+		int canvasHeight = canvas->getHeight();
 
-		// We have drawn something, so now the canvas is dirty
-		dirty = 1;
+		for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
+			dc.drawLine(x, 0, x, canvasHeight);
+		}
+		for (int y = 0; y < canvasHeight; y = y + project->get_gridSize()) {
+			dc.drawLine(0, y, canvasWidth, y);
+		}
+
+
 	}
+
 	return 1;
 }
 
@@ -228,38 +251,79 @@ long ProjectWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 	window->setFocus();
 
 
+
 	return 1;
 }
 
-// ------------------- New File Code --------------------- // 
-//    Taken From Adie, still missing getapp->windowlist    //
+// Save
+long ProjectWindow::onCmdSave(FXObject* sender, FXSelector sel, void* ptr) {
+	filename = "MyProject.pjt";
+	filenameset = TRUE;
 
-/*// Generate unique name for a new window
-FXString ProjectWindow::unique() const {
-	FXString name = "untitled";
-	for (FXint i = 1; i < 2147483647; i++) {
-		if (!findWindow(name)) break;
-		name.format("untitled%d", i);
-	}
-	return name;
+	if (!filenameset) return onCmdSaveAs(sender, sel, ptr);
+	
+	saveFile(filename);
+	return 1;
+
+
 }
 
-// Find window, if any, currently editing the given file
-ProjectWindow *ProjectWindow::findWindow(const FXString& file) const {
-	for (FXint w = 0; w < getApp()->windowlist.no(); w++) {
-		if (getApp()->windowlist[w]->getFilename() == file) return getApp()->windowlist[w];
-	}
-	return NULL;
+
+
+// Save As
+long ProjectWindow::onCmdSaveAs(FXObject*, FXSelector, void*) {
+	//FXFileDialog savedialog(getApp(), tr("Save Project"));
+	//FXString file = filename;
+	//savedialog.setSelectMode(SELECTFILE_ANY);
+	//savedialog.setPatternList("All Files (*)");
+	//savedialog.setCurrentPattern(0);
+	//savedialog.setFilename(file);
+	//if (savedialog.execute()) {
+	//	file = savedialog.getFilename();
+	//	if (FXStat::exists(file)) {
+	//		if (MBOX_CLICKED_NO == FXMessageBox::question(this, MBOX_YES_NO, tr("Overwrite Document"), tr("Overwrite existing document: %s?"), file.text())) return 1;
+	//	}
+	//	saveFile(file);
+	//}
+	return 1;
 }
 
-*/
+// Save file
+FXbool ProjectWindow::saveFile(const FXString& file) {
+	FXFileStream  stream;
+	// Save stuff to a FILE stream
+	
 
+	FXTRACE((100, "saveFile(%s)\n", file.text()));
+
+	// Opened file?
+	if (!stream.open(file, FXStreamSave)) {
+		FXMessageBox::error(this, MBOX_OK, tr("Error Saving Project File"), tr("Unable to open file: %s"), file.text());
+		return FALSE;
+	}
+
+	getApp()->beginWaitCursor();
+	
+	// Save data to the file
+	project->get_saveData(stream);
+	stream.close();
+
+
+	// Kill wait cursor
+	getApp()->endWaitCursor();
+
+	// Set stuff
+	filenameset = TRUE;
+	filename = file;
+
+	return TRUE;
+}
 
 // Open file code from adie ---- not yet adapted
 
-/*long ProjectWindow::onCmdOpen(FXObject*, FXSelector, void*) {
-	FXFileDialog opendialog(this, tr("Open Document"));
-	opendialog.setSelectMode(SELECTFILE_EXISTING);
+long ProjectWindow::onCmdOpen(FXObject*, FXSelector, void*) {
+	//FXFileDialog opendialog(this, tr("Open Document"));
+	/*opendialog.setSelectMode(SELECTFILE_EXISTING);
 	opendialog.setPatternList(getPatterns());
 	opendialog.setCurrentPattern(getCurrentPattern());
 	opendialog.setDirectory(FXPath::directory(filename));
@@ -279,9 +343,9 @@ ProjectWindow *ProjectWindow::findWindow(const FXString& file) const {
 		}
 		window->raise();
 		window->setFocus();
-	}
+	}*/
 	return 1;
-}*/
+}
 
 
 
