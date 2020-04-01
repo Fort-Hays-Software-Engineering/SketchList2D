@@ -6,6 +6,7 @@
 #include <FXRadioButton.h>
 
 
+
 FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
 
 	//________Message_Type_____________________ID____________Message_Handler_______
@@ -219,6 +220,22 @@ long ProjectWindow::onPaint(FXObject*, FXSelector, void* ptr) {
 	FXDCWindow dc(canvas, ev);
 	dc.setForeground(canvas->getBackColor());
 	dc.fillRectangle(ev->rect.x, ev->rect.y, ev->rect.w, ev->rect.h);
+
+	dc.setForeground(drawColor);
+
+	// Draw line
+	//dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
+
+	//Draw Grid
+	int canvasWidth = canvas->getWidth();
+	int canvasHeight = canvas->getHeight();
+
+	for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
+		dc.drawLine(x, 0, x, canvasHeight);
+	}
+	for (int y = 0; y < canvasHeight; y = y + project->get_gridSize()) {
+		dc.drawLine(0, y, canvasWidth, y);
+	}
 	return 1;
 }
 
@@ -346,7 +363,6 @@ long ProjectWindow::onCmdOpen(FXObject*, FXSelector, void*) {
 	}*/
 	return 1;
 }
-
 
 
 // Update the clear button:- each gui element (widget) in FOX
