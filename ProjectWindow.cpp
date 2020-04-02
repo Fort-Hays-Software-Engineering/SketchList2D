@@ -399,29 +399,67 @@ FXbool ProjectWindow::saveFile(const FXString& file) {
 // Open file code from adie ---- not yet adapted
 
 long ProjectWindow::onCmdOpen(FXObject*, FXSelector, void*) {
-	//FXFileDialog opendialog(this, tr("Open Document"));
-	/*opendialog.setSelectMode(SELECTFILE_EXISTING);
-	opendialog.setPatternList(getPatterns());
-	opendialog.setCurrentPattern(getCurrentPattern());
+	FXFileDialog opendialog(this, tr("Open Document"));
+	opendialog.setSelectMode(SELECTFILE_EXISTING);
+	opendialog.setPatternList("Project Files(*.pjt)\nAll Files (*)");
+	opendialog.setCurrentPattern(0);
 	opendialog.setDirectory(FXPath::directory(filename));
 	if (opendialog.execute()) {
-		setCurrentPattern(opendialog.getCurrentPattern());
+
 		FXString file = opendialog.getFilename();
-		ProjectWindow *window = findWindow(file);
-		if (!window) {
+
+		//window->isSplashScreen = 0;
+		//window->create();
+		loadFile(file);
+		//window->raise();
+		//window->setFocus();
+
+		/*if (!window) {
 			window = findUnused();
 			if (!window) {
 				window = new TextWindow(getApp(), unique());
 				window->create();
 			}
-			window->loadFile(file);
+			project->loadFile(file);
 			window->readBookmarks(file);
 			window->readView(file);
-		}
-		window->raise();
-		window->setFocus();
-	}*/
+		}*/
+		//window->raise();
+		//window->setFocus();
+	}
 	return 1;
+}
+
+// Load file
+FXbool ProjectWindow::loadFile(const FXString& file) {
+	FXFileStream  stream;
+
+
+	FXTRACE((100, "loadFile(%s)\n", file.text()));
+
+	// Opened file?
+	if (!stream.open(file, FXStreamLoad)) {
+		FXMessageBox::error(this, MBOX_OK, tr("Error Saving Project File"), tr("Unable to open file: %s"), file.text());
+		return FALSE;
+	}
+
+	// Set wait cursor
+	getApp()->beginWaitCursor();
+
+	project->loadProject(stream);
+
+
+
+	// Kill wait cursor
+	getApp()->endWaitCursor();
+
+	// Set stuff
+	filetime = FXStat::modified(file);
+	filenameset = TRUE;
+	filename = file;
+	setTitle("SketchList 2D Room Designer - " + project->get_gridSize());
+
+	return TRUE;
 }
 
 

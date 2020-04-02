@@ -135,7 +135,7 @@ public:
 
 	// Save text to file
 	FXbool saveFile(const FXString& file);
-
+	FXbool loadFile(const FXString& file);
 	virtual ~ProjectWindow();
 };
 

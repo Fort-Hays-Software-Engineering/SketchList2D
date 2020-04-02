@@ -27,6 +27,15 @@ void Project::get_saveData(FXStream& stream)
 	stream << gridSize;
 }
 
+void Project::loadProject(FXStream& stream)
+{
+
+	// Load my stuff from a stream
+								 // number of total data values being serialized
+	stream >> numdata;           // Save the number of data values
+	stream >> gridSize;
+}
+
 void Project::addPlaceable(int x, int y, int h, int w)
 {
 	placeables[placeableCount] = new Placeable(x, y, h, w);
