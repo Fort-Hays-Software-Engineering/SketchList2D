@@ -57,6 +57,7 @@ private:
 	Project* project;
 
 	Placeable *currentSelection;
+	void drawControlHandles();
 
 protected:
 	ProjectWindow() {}

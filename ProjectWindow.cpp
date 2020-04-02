@@ -187,6 +187,8 @@ void ProjectWindow::drawScreen()
 	for (int i = 0; i < project->get_placeableCount(); i++) {
 		dc.drawRectangle(project->placeables[i]->get_xPos(), project->placeables[i]->get_yPos(), project->placeables[i]->get_height(), project->placeables[i]->get_width());
 	}
+	if(currentSelection != NULL)
+		drawControlHandles();
 }
 
 // Mouse button was pressed somewhere
@@ -208,22 +210,10 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 		int yEnd = xStart + project->placeables[i]->get_height();
 
 		if (clickX >= xStart && clickY >= yStart && clickX <= xEnd && clickY <= yEnd) {
-			//draw control handles
-			//top left
-			dc.drawLine(xStart - 5, yStart - 5, xStart-5, yStart);
-			dc.drawLine(xStart - 5, yStart - 5, xStart, yStart - 5);
-			//top right
-			dc.drawLine(xEnd + 5, yStart - 5, xEnd + 5, yStart);
-			dc.drawLine(xEnd + 5, yStart - 5, xEnd, yStart - 5);
-			//bottom left
-			dc.drawLine(xStart - 5, yEnd + 5, xStart - 5, yEnd);
-			dc.drawLine(xStart - 5, yEnd + 5, xStart, yEnd + 5);
-			//bottom right
-			dc.drawLine(xEnd + 5, yEnd + 5, xEnd + 5, yEnd);
-			dc.drawLine(xEnd + 5, yEnd + 5, xEnd, yEnd + 5);
-
 			//assign clicked placeable to pointer to keep track of it
 			currentSelection = project->placeables[i];
+			//draw control handles
+			drawControlHandles();
 			break;
 		}
 
@@ -266,6 +256,28 @@ long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
 	return 1;
 }
 
+
+void ProjectWindow::drawControlHandles()
+{
+	FXDCWindow dc(canvas);
+	int xStart = currentSelection->get_xPos();
+	int xEnd = xStart + currentSelection->get_width();
+	int yStart = currentSelection->get_yPos();
+	int yEnd = xStart + currentSelection->get_height();
+	//top left
+	dc.drawLine(xStart - 5, yStart - 5, xStart - 5, yStart);
+	dc.drawLine(xStart - 5, yStart - 5, xStart, yStart - 5);
+	//top right
+	dc.drawLine(xEnd + 5, yStart - 5, xEnd + 5, yStart);
+	dc.drawLine(xEnd + 5, yStart - 5, xEnd, yStart - 5);
+	//bottom left
+	dc.drawLine(xStart - 5, yEnd + 5, xStart - 5, yEnd);
+	dc.drawLine(xStart - 5, yEnd + 5, xStart, yEnd + 5);
+	//bottom right
+	dc.drawLine(xEnd + 5, yEnd + 5, xEnd + 5, yEnd);
+	dc.drawLine(xEnd + 5, yEnd + 5, xEnd, yEnd + 5);
+
+}
 
 // Paint the canvas
 long ProjectWindow::onPaint(FXObject*, FXSelector, void* ptr) {
