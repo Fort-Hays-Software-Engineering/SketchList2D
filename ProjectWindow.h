@@ -7,6 +7,7 @@
 
 #include "fx.h"
 #include "Project.h";
+#include "Placeable.h"
 
 
 class NewWindow;
@@ -51,10 +52,12 @@ private:
 	int                mdflag;                  // Mouse button down?
 	int                dirty;                   // Canvas has been painted?
 	int                isSplashScreen;      // Is this the opening splash screen?
-	FXColor            gridColor;               // Color for the grid lines
+	FXColor            drawColor;               // Color for the grid lines
 	FXColor			   placeableColor;			// Color for placeables
 
 	Project* project;
+
+	Placeable *currentSelection;
 
 protected:
 	ProjectWindow() {}

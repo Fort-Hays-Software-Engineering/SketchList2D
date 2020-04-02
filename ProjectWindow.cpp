@@ -8,8 +8,6 @@
 
 #pragma comment (lib, "ws2_32")
 
-
-
 FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
 
 	//________Message_Type_____________________ID____________Message_Handler_______
@@ -74,9 +72,9 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	cabinetFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(cabinetFrame, "Cabinet", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
 	cabinet = new FXText(cabinetFrame);
-	
 
-	
+
+
 	//middleSplashFrame = new FXHorizontalFrame(contents, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 90, 0, 0, 0, 0, 0);
 
 		// LEFT pane for the buttons
@@ -98,7 +96,7 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 		//new FXButton(buttonFrame, "&Exit", NULL, this, FXApp::ID_QUIT, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
 
 		// RIGHT pane to contain the canvas
-		
+
 
 		// Label above the canvas
 		//new FXLabel(canvasFrame, "Room Grid", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
@@ -108,7 +106,7 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 
 
 		// Drawing canvas
-		
+
 
 
 	// Status bar
@@ -129,8 +127,7 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	new FXMenuCommand(filemenu, tr("&Exit\tAlt-F4\tExit Program."), NULL, this, FXApp::ID_QUIT);
 
 	// Initialize private variables
-	gridColor = FXRGB(207, 207, 207);
-	placeableColor = FXRGB(0, 0, 0);
+	drawColor = FXRGB(207, 207, 207);
 	mdflag = 0;
 	dirty = 0;
 
@@ -156,15 +153,15 @@ void ProjectWindow::create() {
 	filemenu->create();
 	// Make the main window appear
 	show(PLACEMENT_SCREEN);
-	
+
 
 
 }
 
 long ProjectWindow::onCmdNewPlacable(FXObject*, FXSelector, void*) {
-	FXDCWindow dc(canvas);
-	project->addPlaceable(0, 0, 50, 50);
-	drawScreen();
+	FXDCWindow dc(canvas); //get the canvas
+	project->addPlaceable(20, 20, 50, 50); //add a new placeable to the project
+	drawScreen(); //redraw the screen
 	return 1;
 }
 
@@ -175,8 +172,7 @@ void ProjectWindow::drawScreen()
 	//draw grid
 	int canvasWidth = canvas->getWidth();
 	int canvasHeight = canvas->getHeight();
-	//set draw color to gridColor
-	dc.setForeground(gridColor);
+	dc.setForeground(drawColor);
 
 	for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
 		dc.drawLine(x, 0, x, canvasHeight);
@@ -185,19 +181,58 @@ void ProjectWindow::drawScreen()
 		dc.drawLine(0, y, canvasWidth, y);
 	}
 
+	dc.setForeground(FXRGB(0, 0, 0));
+
 	//draw placeables
-	//set draw color to placeables color
-	dc.setForeground(placeableColor);
 	for (int i = 0; i < project->get_placeableCount(); i++) {
 		dc.drawRectangle(project->placeables[i]->get_xPos(), project->placeables[i]->get_yPos(), project->placeables[i]->get_height(), project->placeables[i]->get_width());
 	}
 }
 
 // Mouse button was pressed somewhere
-long ProjectWindow::onMouseDown(FXObject*, FXSelector, void*) {
+long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 	canvas->grab();
+	FXEvent *ev = (FXEvent*)ptr;
+	int clickX, clickY;
+	//get mouse position
+	clickX = ev->click_x;
+	clickY = ev->click_y;
 
-	// While the mouse is down, we'll draw lines
+	FXDCWindow dc(canvas);
+
+	//iterate through placeables seeing if this position is inside one of the rectangles
+	for (int i = 0; i < project->get_placeableCount(); i++) {
+		int xStart = project->placeables[i]->get_xPos();
+		int xEnd = xStart + project->placeables[i]->get_width();
+		int yStart = project->placeables[i]->get_yPos();
+		int yEnd = xStart + project->placeables[i]->get_height();
+
+		if (clickX >= xStart && clickY >= yStart && clickX <= xEnd && clickY <= yEnd) {
+			//draw control handles
+			//top left
+			dc.drawLine(xStart - 5, yStart - 5, xStart - 5, yStart);
+			dc.drawLine(xStart - 5, yStart - 5, xStart, yStart - 5);
+			//top right
+			dc.drawLine(xEnd + 5, yStart - 5, xEnd + 5, yStart);
+			dc.drawLine(xEnd + 5, yStart - 5, xEnd, yStart - 5);
+			//bottom left
+			dc.drawLine(xStart - 5, yEnd + 5, xStart - 5, yEnd);
+			dc.drawLine(xStart - 5, yEnd + 5, xStart, yEnd + 5);
+			//bottom right
+			dc.drawLine(xEnd + 5, yEnd + 5, xEnd + 5, yEnd);
+			dc.drawLine(xEnd + 5, yEnd + 5, xEnd, yEnd + 5);
+
+			//assign clicked placeable to pointer to keep track of it
+			currentSelection = project->placeables[i];
+			break;
+		}
+
+	}
+
+	//use data targets to put this placeable's info in onscreen controls
+
+
+
 	mdflag = 1;
 
 	return 1;
@@ -207,29 +242,6 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void*) {
 
 // The mouse has moved, draw a line
 long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
-
-	//if (mdflag) {
-	//	// Get DC for the canvas
-	//	FXDCWindow dc(canvas);
-
-	//	// Set foreground color
-	//	dc.setForeground(drawColor);
-
-	//	// Draw line
-	//	//dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
-	//	int canvasWidth = canvas->getWidth();
-	//	int canvasHeight = canvas->getHeight();
-
-	//	for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
-	//		dc.drawLine(x, 0, x, canvasHeight);
-	//	}
-	//	for (int y = 0; y < canvasHeight; y = y + project->get_gridSize()) {
-	//		dc.drawLine(0, y, canvasWidth, y);
-	//	}
-
-
-	//}
-
 	return 1;
 }
 
@@ -242,7 +254,7 @@ long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
 	if (mdflag) {
 		FXDCWindow dc(canvas);
 
-		dc.setForeground(placeableColor);
+		dc.setForeground(drawColor);
 		dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
 
 		// We have drawn something, so now the canvas is dirty
@@ -262,14 +274,9 @@ long ProjectWindow::onPaint(FXObject*, FXSelector, void* ptr) {
 	dc.setForeground(canvas->getBackColor());
 	dc.fillRectangle(ev->rect.x, ev->rect.y, ev->rect.w, ev->rect.h);
 
-	dc.setForeground(placeableColor);
-
-	// Draw line
-	//dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
-
-	//Draw Grid
+	//Draw Grid and placeables
 	drawScreen();
-	
+
 	return 1;
 }
 
@@ -308,12 +315,8 @@ long ProjectWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 
 // Save
 long ProjectWindow::onCmdSave(FXObject* sender, FXSelector sel, void* ptr) {
-	//filename = "MyProject.pjt";
-	//filenameset = TRUE;
-	
-
 	if (!filenameset) return onCmdSaveAs(sender, sel, ptr);
-	
+
 	saveFile(filename);
 	return 1;
 
@@ -344,7 +347,7 @@ long ProjectWindow::onCmdSaveAs(FXObject*, FXSelector, void*) {
 FXbool ProjectWindow::saveFile(const FXString& file) {
 	FXFileStream  stream;
 	// Save stuff to a FILE stream
-	
+
 
 	FXTRACE((100, "saveFile(%s)\n", file.text()));
 
@@ -355,7 +358,7 @@ FXbool ProjectWindow::saveFile(const FXString& file) {
 	}
 
 	getApp()->beginWaitCursor();
-	
+
 	// Save data to the file
 	project->get_saveData(stream);
 	stream.close();
@@ -365,7 +368,6 @@ FXbool ProjectWindow::saveFile(const FXString& file) {
 	getApp()->endWaitCursor();
 
 	// Set stuff
-	
 	filenameset = TRUE;
 	filename = file;
 	setTitle("SketchList 2D Room Designer - " + file);
