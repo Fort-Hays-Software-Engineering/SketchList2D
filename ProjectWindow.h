@@ -31,7 +31,7 @@ private:
 	FXVerticalFrame   *placeableDataPanel;      // The panel where data about the currently selected placeable is displayed
 
 	FXHorizontalFrame *widthFrame;              // Width frame of the data panel
-	FXText            *widthText;
+	FXTextField            *widthText;
 
 	FXHorizontalFrame *cabinetFrame;
 	FXText          *cabinet;                 //cabinet test
@@ -41,7 +41,7 @@ private:
 	FXRadioButton     *inchRadio;
 
 	FXHorizontalFrame *heightFrame;             // height frame of the data panel
-	FXText            *heightText;
+	FXTextField            *heightText;
 
 	FXVerticalFrame   *createNewProjectFrame;   // Create New Project label and button
 	FXVerticalFrame   *loadProjectFrame;        // Splash screen load new project frame
@@ -53,6 +53,8 @@ private:
 	int                dirty;                   // Canvas has been painted?
 	int                isSplashScreen;      // Is this the opening splash screen?
 	FXColor            drawColor;               // Color for the line
+
+	int itemClicked;
 
 	Project* project;
 

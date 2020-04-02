@@ -16,6 +16,16 @@ Placeable::Placeable(int x, int y, int h, int w)
 	width = w;
 }
 
+void Placeable::set_xPos(int newX)
+{
+	xPos = newX;
+}
+
+void Placeable::set_yPos(int newY)
+{
+	yPos = newY;
+}
+
 int Placeable::get_xPos()
 {
 	return xPos;

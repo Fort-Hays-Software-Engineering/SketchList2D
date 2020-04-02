@@ -55,11 +55,11 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 
 	widthFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(widthFrame, "Width", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
-	widthText = new FXText(widthFrame);
+	widthText = new FXTextField(widthFrame, 5, NULL, 0, TEXTFIELD_INTEGER);
 
 	heightFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(heightFrame, "Height", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
-	heightText = new FXText(heightFrame);
+	heightText = new FXTextField(heightFrame, NULL, 0, TEXTFIELD_INTEGER);
 
 	unitsFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	feetRadio = new FXRadioButton(unitsFrame, "Feet");
@@ -130,6 +130,7 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	drawColor = FXRGB(207, 207, 207);
 	mdflag = 0;
 	dirty = 0;
+	itemClicked = 0;
 
 
 }
@@ -168,10 +169,13 @@ long ProjectWindow::onCmdNewPlacable(FXObject*, FXSelector, void*) {
 void ProjectWindow::drawScreen()
 {
 	FXDCWindow dc(canvas);
+	dc.setForeground(canvas->getBackColor());
+	
 
 	//draw grid
 	int canvasWidth = canvas->getWidth();
 	int canvasHeight = canvas->getHeight();
+	dc.fillRectangle(0, 0, canvasWidth, canvasHeight);
 	dc.setForeground(drawColor);
 
 	for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
@@ -201,28 +205,35 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 	clickY = ev->click_y;
 
 	FXDCWindow dc(canvas);
+	if (mdflag == 0) {
 
-	//iterate through placeables seeing if this position is inside one of the rectangles
-	for (int i = 0; i < project->get_placeableCount(); i++) {
-		int xStart = project->placeables[i]->get_xPos();
-		int xEnd = xStart + project->placeables[i]->get_width();
-		int yStart = project->placeables[i]->get_yPos();
-		int yEnd = xStart + project->placeables[i]->get_height();
 
-		if (clickX >= xStart && clickY >= yStart && clickX <= xEnd && clickY <= yEnd) {
-			//assign clicked placeable to pointer to keep track of it
-			currentSelection = project->placeables[i];
-			//draw control handles
-			drawControlHandles();
-			break;
+		//iterate through placeables seeing if this position is inside one of the rectangles
+		for (int i = 0; i < project->get_placeableCount(); i++) {
+			int xStart = project->placeables[i]->get_xPos();
+			int xEnd = xStart + project->placeables[i]->get_width();
+			int yStart = project->placeables[i]->get_yPos();
+			int yEnd = xStart + project->placeables[i]->get_height();
+
+			if (clickX >= xStart && clickY >= yStart && clickX <= xEnd && clickY <= yEnd) {
+				//assign clicked placeable to pointer to keep track of it
+				currentSelection = project->placeables[i];
+				//heightText->setText(""+ project->placeables[i]->get_height());
+				heightText->setText("");
+				widthText->setText("");
+				//draw control handles
+				drawScreen();
+				itemClicked = 1;
+				mdflag = 1;
+				return 1;
+			}
+
 		}
-
 	}
-
 	//use data targets to put this placeable's info in onscreen controls
 
 
-
+	itemClicked = 0;
 	mdflag = 1;
 
 	return 1;
@@ -230,8 +241,17 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 
 
 
-// The mouse has moved, draw a line
+// The mouse has moved, and a placeable is selected, move it
 long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
+	FXEvent *ev = (FXEvent*)ptr;
+	if (currentSelection != NULL) {
+		if (itemClicked == 1 && mdflag == 1) {
+			currentSelection->set_xPos(currentSelection->get_xPos() + ev->win_x - ev->last_x);
+			currentSelection->set_yPos(currentSelection->get_yPos() + ev->win_y - ev->last_y);
+			drawScreen();
+		}
+	}
+
 	return 1;
 }
 
@@ -242,16 +262,10 @@ long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
 	FXEvent *ev = (FXEvent*)ptr;
 	canvas->ungrab();
 	if (mdflag) {
-		FXDCWindow dc(canvas);
-
-		dc.setForeground(drawColor);
-		dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
-
-		// We have drawn something, so now the canvas is dirty
-		dirty = 1;
 
 		// Mouse no longer down
 		mdflag = 0;
+		itemClicked = 0;
 	}
 	return 1;
 }
@@ -281,11 +295,6 @@ void ProjectWindow::drawControlHandles()
 
 // Paint the canvas
 long ProjectWindow::onPaint(FXObject*, FXSelector, void* ptr) {
-	FXEvent *ev = (FXEvent*)ptr;
-	FXDCWindow dc(canvas, ev);
-	dc.setForeground(canvas->getBackColor());
-	dc.fillRectangle(ev->rect.x, ev->rect.y, ev->rect.w, ev->rect.h);
-
 	//Draw Grid and placeables
 	drawScreen();
 	
