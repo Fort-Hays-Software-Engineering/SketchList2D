@@ -159,9 +159,9 @@ void ProjectWindow::create() {
 }
 
 long ProjectWindow::onCmdNewPlacable(FXObject*, FXSelector, void*) {
-	FXDCWindow dc(canvas);
-	project->addPlaceable(0, 0, 50, 50);
-	drawScreen();
+	FXDCWindow dc(canvas); //get the canvas
+	project->addPlaceable(0, 0, 50, 50); //add a new placeable to the project
+	drawScreen(); //redraw the screen
 	return 1;
 }
 
@@ -172,6 +172,7 @@ void ProjectWindow::drawScreen()
 	//draw grid
 	int canvasWidth = canvas->getWidth();
 	int canvasHeight = canvas->getHeight();
+	dc.setForeground(drawColor);
 
 	for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
 		dc.drawLine(x, 0, x, canvasHeight);
@@ -179,6 +180,8 @@ void ProjectWindow::drawScreen()
 	for (int y = 0; y < canvasHeight; y = y + project->get_gridSize()) {
 		dc.drawLine(0, y, canvasWidth, y);
 	}
+
+	dc.setForeground(FXRGB(0, 0, 0));
 
 	//draw placeables
 	for (int i = 0; i < project->get_placeableCount(); i++) {
