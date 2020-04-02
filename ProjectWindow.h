@@ -30,6 +30,9 @@ private:
 	FXHorizontalFrame *widthFrame;              // Width frame of the data panel
 	FXText            *widthText;
 
+	FXHorizontalFrame *cabinetFrame;
+	FXText          *cabinet;                 //cabinet test
+
 	FXHorizontalFrame *unitsFrame;              // units frame of the data panel
 	FXRadioButton     *feetRadio;
 	FXRadioButton     *inchRadio;
@@ -97,6 +100,7 @@ public:
 		ID_SAVE,
 		ID_SAVEAS,
 		ID_NEWPROJECT,
+		ID_CABINET,
 		ID_VIEWBOM,
 		ID_LAST
 	};
