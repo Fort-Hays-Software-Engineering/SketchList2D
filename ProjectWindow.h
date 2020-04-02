@@ -51,7 +51,8 @@ private:
 	int                mdflag;                  // Mouse button down?
 	int                dirty;                   // Canvas has been painted?
 	int                isSplashScreen;      // Is this the opening splash screen?
-	FXColor            drawColor;               // Color for the line
+	FXColor            gridColor;               // Color for the grid lines
+	FXColor			   placeableColor;			// Color for placeables
 
 	Project* project;
 

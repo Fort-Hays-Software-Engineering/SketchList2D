@@ -6,6 +6,8 @@
 #include <FXRadioButton.h>
 #include <FXDCWindow.h>
 
+#pragma comment (lib, "ws2_32")
+
 
 
 FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
@@ -127,7 +129,8 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	new FXMenuCommand(filemenu, tr("&Exit\tAlt-F4\tExit Program."), NULL, this, FXApp::ID_QUIT);
 
 	// Initialize private variables
-	drawColor = FXRGB(207, 207, 207);
+	gridColor = FXRGB(207, 207, 207);
+	placeableColor = FXRGB(0, 0, 0);
 	mdflag = 0;
 	dirty = 0;
 
@@ -172,6 +175,8 @@ void ProjectWindow::drawScreen()
 	//draw grid
 	int canvasWidth = canvas->getWidth();
 	int canvasHeight = canvas->getHeight();
+	//set draw color to gridColor
+	dc.setForeground(gridColor);
 
 	for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
 		dc.drawLine(x, 0, x, canvasHeight);
@@ -181,6 +186,8 @@ void ProjectWindow::drawScreen()
 	}
 
 	//draw placeables
+	//set draw color to placeables color
+	dc.setForeground(placeableColor);
 	for (int i = 0; i < project->get_placeableCount(); i++) {
 		dc.drawRectangle(project->placeables[i]->get_xPos(), project->placeables[i]->get_yPos(), project->placeables[i]->get_height(), project->placeables[i]->get_width());
 	}
@@ -235,7 +242,7 @@ long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
 	if (mdflag) {
 		FXDCWindow dc(canvas);
 
-		dc.setForeground(drawColor);
+		dc.setForeground(placeableColor);
 		dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
 
 		// We have drawn something, so now the canvas is dirty
@@ -255,7 +262,7 @@ long ProjectWindow::onPaint(FXObject*, FXSelector, void* ptr) {
 	dc.setForeground(canvas->getBackColor());
 	dc.fillRectangle(ev->rect.x, ev->rect.y, ev->rect.w, ev->rect.h);
 
-	dc.setForeground(drawColor);
+	dc.setForeground(placeableColor);
 
 	// Draw line
 	//dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
@@ -301,8 +308,9 @@ long ProjectWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 
 // Save
 long ProjectWindow::onCmdSave(FXObject* sender, FXSelector sel, void* ptr) {
-	filename = "MyProject.pjt";
-	filenameset = TRUE;
+	//filename = "MyProject.pjt";
+	//filenameset = TRUE;
+	
 
 	if (!filenameset) return onCmdSaveAs(sender, sel, ptr);
 	
@@ -316,19 +324,19 @@ long ProjectWindow::onCmdSave(FXObject* sender, FXSelector sel, void* ptr) {
 
 // Save As
 long ProjectWindow::onCmdSaveAs(FXObject*, FXSelector, void*) {
-	//FXFileDialog savedialog(getApp(), tr("Save Project"));
-	//FXString file = filename;
-	//savedialog.setSelectMode(SELECTFILE_ANY);
-	//savedialog.setPatternList("All Files (*)");
-	//savedialog.setCurrentPattern(0);
-	//savedialog.setFilename(file);
-	//if (savedialog.execute()) {
-	//	file = savedialog.getFilename();
-	//	if (FXStat::exists(file)) {
-	//		if (MBOX_CLICKED_NO == FXMessageBox::question(this, MBOX_YES_NO, tr("Overwrite Document"), tr("Overwrite existing document: %s?"), file.text())) return 1;
-	//	}
-	//	saveFile(file);
-	//}
+	FXFileDialog savedialog(getApp(), tr("Save Project"));
+	FXString file = filename;
+	savedialog.setSelectMode(SELECTFILE_ANY);
+	savedialog.setPatternList("All Files (*)");
+	savedialog.setCurrentPattern(0);
+	savedialog.setFilename(file);
+	if (savedialog.execute()) {
+		file = savedialog.getFilename();
+		if (FXStat::exists(file)) {
+			if (MBOX_CLICKED_NO == FXMessageBox::question(this, MBOX_YES_NO, tr("Overwrite Document"), tr("Overwrite existing document: %s?"), file.text())) return 1;
+		}
+		saveFile(file);
+	}
 	return 1;
 }
 
@@ -357,8 +365,10 @@ FXbool ProjectWindow::saveFile(const FXString& file) {
 	getApp()->endWaitCursor();
 
 	// Set stuff
+	
 	filenameset = TRUE;
 	filename = file;
+	setTitle("SketchList 2D Room Designer - " + file);
 
 	return TRUE;
 }
