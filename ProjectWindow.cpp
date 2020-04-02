@@ -190,10 +190,37 @@ void ProjectWindow::drawScreen()
 }
 
 // Mouse button was pressed somewhere
-long ProjectWindow::onMouseDown(FXObject*, FXSelector, void*) {
+long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 	canvas->grab();
+	FXEvent *ev = (FXEvent*)ptr;
+	int clickX, clickY;
+	//get mouse position
+	clickX = ev->click_x;
+	clickY = ev->click_y;
 
-	// While the mouse is down, we'll draw lines
+	FXDCWindow dc(canvas);
+
+	//iterate through placeables seeing if this position is inside one of the rectangles
+	for (int i = 0; i < project->get_placeableCount(); i++) {
+		int xStart = project->placeables[i]->get_xPos();
+		int xEnd = xStart + project->placeables[i]->get_width();
+		int yStart = project->placeables[i]->get_yPos();
+		int yEnd = xStart + project->placeables[i]->get_height();
+
+		if (clickX >= xStart && clickY >= yStart && clickX <= xEnd && clickY <= yEnd) {
+			//draw control handles
+			dc.drawPoint(clickX, clickY); //for now, just a dot as proof of concept that it was found
+			//assign clicked placeable to pointer to keep track of it
+			currentSelection = project->placeables[i];
+			break;
+		}
+
+	}
+
+	//use data targets to put this placeable's info in onscreen controls
+
+
+
 	mdflag = 1;
 
 	return 1;
@@ -203,29 +230,6 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void*) {
 
 // The mouse has moved, draw a line
 long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
-
-	//if (mdflag) {
-	//	// Get DC for the canvas
-	//	FXDCWindow dc(canvas);
-
-	//	// Set foreground color
-	//	dc.setForeground(drawColor);
-
-	//	// Draw line
-	//	//dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
-	//	int canvasWidth = canvas->getWidth();
-	//	int canvasHeight = canvas->getHeight();
-
-	//	for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
-	//		dc.drawLine(x, 0, x, canvasHeight);
-	//	}
-	//	for (int y = 0; y < canvasHeight; y = y + project->get_gridSize()) {
-	//		dc.drawLine(0, y, canvasWidth, y);
-	//	}
-
-
-	//}
-
 	return 1;
 }
 
@@ -258,12 +262,7 @@ long ProjectWindow::onPaint(FXObject*, FXSelector, void* ptr) {
 	dc.setForeground(canvas->getBackColor());
 	dc.fillRectangle(ev->rect.x, ev->rect.y, ev->rect.w, ev->rect.h);
 
-	dc.setForeground(drawColor);
-
-	// Draw line
-	//dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
-
-	//Draw Grid
+	//Draw Grid and placeables
 	drawScreen();
 	
 	return 1;

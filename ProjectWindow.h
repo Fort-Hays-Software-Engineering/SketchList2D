@@ -7,6 +7,7 @@
 
 #include "fx.h"
 #include "Project.h";
+#include "Placeable.h"
 
 
 class NewWindow;
@@ -54,6 +55,8 @@ private:
 	FXColor            drawColor;               // Color for the line
 
 	Project* project;
+
+	Placeable *currentSelection;
 
 protected:
 	ProjectWindow() {}
