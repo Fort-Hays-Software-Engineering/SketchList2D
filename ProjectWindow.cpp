@@ -6,7 +6,7 @@
 #include <FXRadioButton.h>
 #include <FXDCWindow.h>
 
-
+#pragma comment (lib, "ws2_32")
 
 FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
 
@@ -72,9 +72,9 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	cabinetFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(cabinetFrame, "Cabinet", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
 	cabinet = new FXText(cabinetFrame);
-	
 
-	
+
+
 	//middleSplashFrame = new FXHorizontalFrame(contents, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 90, 0, 0, 0, 0, 0);
 
 		// LEFT pane for the buttons
@@ -96,7 +96,7 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 		//new FXButton(buttonFrame, "&Exit", NULL, this, FXApp::ID_QUIT, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
 
 		// RIGHT pane to contain the canvas
-		
+
 
 		// Label above the canvas
 		//new FXLabel(canvasFrame, "Room Grid", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
@@ -106,7 +106,7 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 
 
 		// Drawing canvas
-		
+
 
 
 	// Status bar
@@ -154,7 +154,7 @@ void ProjectWindow::create() {
 	filemenu->create();
 	// Make the main window appear
 	show(PLACEMENT_SCREEN);
-	
+
 
 
 }
@@ -297,7 +297,7 @@ void ProjectWindow::drawControlHandles()
 long ProjectWindow::onPaint(FXObject*, FXSelector, void* ptr) {
 	//Draw Grid and placeables
 	drawScreen();
-	
+
 	return 1;
 }
 
@@ -336,11 +336,8 @@ long ProjectWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 
 // Save
 long ProjectWindow::onCmdSave(FXObject* sender, FXSelector sel, void* ptr) {
-	filename = "MyProject.pjt";
-	filenameset = TRUE;
-
 	if (!filenameset) return onCmdSaveAs(sender, sel, ptr);
-	
+
 	saveFile(filename);
 	return 1;
 
@@ -351,19 +348,19 @@ long ProjectWindow::onCmdSave(FXObject* sender, FXSelector sel, void* ptr) {
 
 // Save As
 long ProjectWindow::onCmdSaveAs(FXObject*, FXSelector, void*) {
-	//FXFileDialog savedialog(getApp(), tr("Save Project"));
-	//FXString file = filename;
-	//savedialog.setSelectMode(SELECTFILE_ANY);
-	//savedialog.setPatternList("All Files (*)");
-	//savedialog.setCurrentPattern(0);
-	//savedialog.setFilename(file);
-	//if (savedialog.execute()) {
-	//	file = savedialog.getFilename();
-	//	if (FXStat::exists(file)) {
-	//		if (MBOX_CLICKED_NO == FXMessageBox::question(this, MBOX_YES_NO, tr("Overwrite Document"), tr("Overwrite existing document: %s?"), file.text())) return 1;
-	//	}
-	//	saveFile(file);
-	//}
+	FXFileDialog savedialog(getApp(), tr("Save Project"));
+	FXString file = filename;
+	savedialog.setSelectMode(SELECTFILE_ANY);
+	savedialog.setPatternList("All Files (*)");
+	savedialog.setCurrentPattern(0);
+	savedialog.setFilename(file);
+	if (savedialog.execute()) {
+		file = savedialog.getFilename();
+		if (FXStat::exists(file)) {
+			if (MBOX_CLICKED_NO == FXMessageBox::question(this, MBOX_YES_NO, tr("Overwrite Document"), tr("Overwrite existing document: %s?"), file.text())) return 1;
+		}
+		saveFile(file);
+	}
 	return 1;
 }
 
@@ -371,7 +368,7 @@ long ProjectWindow::onCmdSaveAs(FXObject*, FXSelector, void*) {
 FXbool ProjectWindow::saveFile(const FXString& file) {
 	FXFileStream  stream;
 	// Save stuff to a FILE stream
-	
+
 
 	FXTRACE((100, "saveFile(%s)\n", file.text()));
 
@@ -382,7 +379,7 @@ FXbool ProjectWindow::saveFile(const FXString& file) {
 	}
 
 	getApp()->beginWaitCursor();
-	
+
 	// Save data to the file
 	project->get_saveData(stream);
 	stream.close();
@@ -394,6 +391,7 @@ FXbool ProjectWindow::saveFile(const FXString& file) {
 	// Set stuff
 	filenameset = TRUE;
 	filename = file;
+	setTitle("SketchList 2D Room Designer - " + file);
 
 	return TRUE;
 }
