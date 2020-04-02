@@ -6,16 +6,23 @@ class Placeable {
 private:
 	int xPos;
 	int yPos;
+	int height;
+	int width;
 	FXRectangle* rectangle;
 
 public:
 	Placeable();
-	Placeable(int x, int y);
+	Placeable(int x, int y, int h, int w);
 	FXRectangle* get_rectangle();
 	void set_xPos(int newX);
 	void set_yPos(int newY);
 	int get_xPos();
 	int get_yPos();
+
+	void set_height(int newHeight);
+	void set_width(int newWidth);
+	int get_height();
+	int get_width();
 	~Placeable() {};
 };
 

@@ -92,6 +92,8 @@ public:
 	//make a new placable
 	long onCmdNewPlacable(FXObject*, FXSelector, void*);
 
+	void drawScreen(); //draw the canvas
+
 	FXApp* getApp() const { return (FXApp*)FXMainWindow::getApp(); }
 
 public:

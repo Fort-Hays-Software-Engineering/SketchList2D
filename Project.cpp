@@ -27,10 +27,15 @@ void Project::get_saveData(FXStream& stream)
 	stream << gridSize;
 }
 
-void Project::addPlaceable(int x, int y)
+void Project::addPlaceable(int x, int y, int h, int w)
 {
-	placeables[placeableCount] = new Placeable(x, y);
+	placeables[placeableCount] = new Placeable(x, y, h, w);
 	placeableCount++;
+}
+
+int Project::get_placeableCount()
+{
+	return placeableCount;
 }
 
 

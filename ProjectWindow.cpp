@@ -160,10 +160,30 @@ void ProjectWindow::create() {
 
 long ProjectWindow::onCmdNewPlacable(FXObject*, FXSelector, void*) {
 	FXDCWindow dc(canvas);
-
-	dc.drawRectangle(0, 0, 50, 50);
-	project->addPlaceable(0, 0);
+	project->addPlaceable(0, 0, 50, 50);
+	drawScreen();
 	return 1;
+}
+
+void ProjectWindow::drawScreen()
+{
+	FXDCWindow dc(canvas);
+
+	//draw grid
+	int canvasWidth = canvas->getWidth();
+	int canvasHeight = canvas->getHeight();
+
+	for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
+		dc.drawLine(x, 0, x, canvasHeight);
+	}
+	for (int y = 0; y < canvasHeight; y = y + project->get_gridSize()) {
+		dc.drawLine(0, y, canvasWidth, y);
+	}
+
+	//draw placeables
+	for (int i = 0; i < project->get_placeableCount(); i++) {
+		dc.drawRectangle(project->placeables[i]->get_xPos(), project->placeables[i]->get_yPos(), project->placeables[i]->get_height(), project->placeables[i]->get_width());
+	}
 }
 
 // Mouse button was pressed somewhere
@@ -241,15 +261,8 @@ long ProjectWindow::onPaint(FXObject*, FXSelector, void* ptr) {
 	//dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
 
 	//Draw Grid
-	int canvasWidth = canvas->getWidth();
-	int canvasHeight = canvas->getHeight();
-
-	for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
-		dc.drawLine(x, 0, x, canvasHeight);
-	}
-	for (int y = 0; y < canvasHeight; y = y + project->get_gridSize()) {
-		dc.drawLine(0, y, canvasWidth, y);
-	}
+	drawScreen();
+	
 	return 1;
 }
 
