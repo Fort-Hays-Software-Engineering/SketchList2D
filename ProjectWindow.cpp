@@ -21,6 +21,7 @@ FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
 	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_SAVE,   ProjectWindow::onCmdSave),
 	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_SAVEAS,   ProjectWindow::onCmdSaveAs),
 	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPROJECT,    ProjectWindow::onCmdNewProject),
+	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPLACEABLE,    ProjectWindow::onCmdNewPlacable),
 };
 
 
@@ -45,6 +46,8 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	//Create combo box that lists the different placable objects to select from
 	placeableTypeComboBox = new FXComboBox(LeftPanel, 1, NULL, 0, COMBOBOX_STATIC, 90, 90, 90, 90, 2, 2, 2, 2);
 	configurePlaceableComboBox(placeableTypeComboBox);
+
+	new FXButton(LeftPanel, "&New Item", NULL, this, ID_NEWPLACEABLE, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
 
 	//Frame where data about the currently selected placable type is displayed
 	placeableDataPanel = new FXVerticalFrame(LeftPanel, FRAME_SUNKEN | LAYOUT_FILL_Y | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 10, 10);
@@ -155,7 +158,13 @@ void ProjectWindow::create() {
 
 }
 
+long ProjectWindow::onCmdNewPlacable(FXObject*, FXSelector, void*) {
+	FXDCWindow dc(canvas);
 
+	dc.drawRectangle(0, 0, 50, 50);
+	project->addPlaceable(0, 0);
+	return 1;
+}
 
 // Mouse button was pressed somewhere
 long ProjectWindow::onMouseDown(FXObject*, FXSelector, void*) {
@@ -172,27 +181,27 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void*) {
 // The mouse has moved, draw a line
 long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 
-	if (mdflag) {
-		// Get DC for the canvas
-		FXDCWindow dc(canvas);
+	//if (mdflag) {
+	//	// Get DC for the canvas
+	//	FXDCWindow dc(canvas);
 
-		// Set foreground color
-		dc.setForeground(drawColor);
+	//	// Set foreground color
+	//	dc.setForeground(drawColor);
 
-		// Draw line
-		//dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
-		int canvasWidth = canvas->getWidth();
-		int canvasHeight = canvas->getHeight();
+	//	// Draw line
+	//	//dc.drawLine(ev->last_x, ev->last_y, ev->win_x, ev->win_y);
+	//	int canvasWidth = canvas->getWidth();
+	//	int canvasHeight = canvas->getHeight();
 
-		for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
-			dc.drawLine(x, 0, x, canvasHeight);
-		}
-		for (int y = 0; y < canvasHeight; y = y + project->get_gridSize()) {
-			dc.drawLine(0, y, canvasWidth, y);
-		}
+	//	for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
+	//		dc.drawLine(x, 0, x, canvasHeight);
+	//	}
+	//	for (int y = 0; y < canvasHeight; y = y + project->get_gridSize()) {
+	//		dc.drawLine(0, y, canvasWidth, y);
+	//	}
 
 
-	}
+	//}
 
 	return 1;
 }

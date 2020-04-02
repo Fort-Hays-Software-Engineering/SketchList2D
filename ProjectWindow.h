@@ -25,6 +25,8 @@ private:
 	FXVerticalFrame   *LeftPanel;               // Left control panel
 	FXComboBox        *placeableTypeComboBox;   // List of placables the user chooses from
 
+	FXButton          *createNewPlaceableButton;// Button to create a new placable
+
 	FXVerticalFrame   *placeableDataPanel;      // The panel where data about the currently selected placeable is displayed
 
 	FXHorizontalFrame *widthFrame;              // Width frame of the data panel
@@ -87,6 +89,9 @@ public:
 	//create a new project
 	long onCmdNewProject(FXObject*, FXSelector, void*);
 
+	//make a new placable
+	long onCmdNewPlacable(FXObject*, FXSelector, void*);
+
 	FXApp* getApp() const { return (FXApp*)FXMainWindow::getApp(); }
 
 public:
@@ -100,6 +105,7 @@ public:
 		ID_SAVE,
 		ID_SAVEAS,
 		ID_NEWPROJECT,
+		ID_NEWPLACEABLE,
 		ID_CABINET,
 		ID_VIEWBOM,
 		ID_LAST
