@@ -160,7 +160,7 @@ void ProjectWindow::create() {
 
 long ProjectWindow::onCmdNewPlacable(FXObject*, FXSelector, void*) {
 	FXDCWindow dc(canvas); //get the canvas
-	project->addPlaceable(0, 0, 50, 50); //add a new placeable to the project
+	project->addPlaceable(20, 20, 50, 50); //add a new placeable to the project
 	drawScreen(); //redraw the screen
 	return 1;
 }
@@ -209,7 +209,19 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 
 		if (clickX >= xStart && clickY >= yStart && clickX <= xEnd && clickY <= yEnd) {
 			//draw control handles
-			dc.drawPoint(clickX, clickY); //for now, just a dot as proof of concept that it was found
+			//top left
+			dc.drawLine(xStart - 5, yStart - 5, xStart-5, yStart);
+			dc.drawLine(xStart - 5, yStart - 5, xStart, yStart - 5);
+			//top right
+			dc.drawLine(xEnd + 5, yStart - 5, xEnd + 5, yStart);
+			dc.drawLine(xEnd + 5, yStart - 5, xEnd, yStart - 5);
+			//bottom left
+			dc.drawLine(xStart - 5, yEnd + 5, xStart - 5, yEnd);
+			dc.drawLine(xStart - 5, yEnd + 5, xStart, yEnd + 5);
+			//bottom right
+			dc.drawLine(xEnd + 5, yEnd + 5, xEnd + 5, yEnd);
+			dc.drawLine(xEnd + 5, yEnd + 5, xEnd, yEnd + 5);
+
 			//assign clicked placeable to pointer to keep track of it
 			currentSelection = project->placeables[i];
 			break;
