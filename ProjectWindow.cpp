@@ -79,7 +79,7 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 
 	new FXLabel(LeftPanel, "Grid Size", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
 	gridSizeSlider = new FXSlider(LeftPanel, this, ID_GRIDSIZE, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0);
-	gridSizeSlider->setRange(1, 100);
+	gridSizeSlider->setRange(10, 100);
 	gridSizeSlider->setIncrement(10);
 
 	// Status bar
@@ -229,6 +229,10 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 				mdflag = 1;
 				return 1;
 
+			}
+			else { // No item clicked, Deselect
+				currentSelection = NULL;
+				drawScreen();
 			}
 
 		}
