@@ -6,6 +6,7 @@
 #include <FXRadioButton.h>
 #include <FXDCWindow.h>
 
+
 #pragma comment (lib, "ws2_32")
 
 FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
@@ -74,41 +75,6 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	cabinet = new FXText(cabinetFrame);
 
 
-
-	//middleSplashFrame = new FXHorizontalFrame(contents, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 90, 0, 0, 0, 0, 0);
-
-		// LEFT pane for the buttons
-		//buttonFrame = new FXVerticalFrame(middleSplashFrame, FRAME_SUNKEN | LAYOUT_FILL_Y | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 10, 10);
-
-		// Lets Get Started Create New Project Label and Button
-		//new FXLabel(buttonFrame, "Let's Get Started", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
-		//new FXButton(buttonFrame, "&Create New Project", NULL, this, ID_CLEAR, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
-
-		// Horizontal divider line
-		//new FXHorizontalSeparator(buttonFrame, SEPARATOR_RIDGE | LAYOUT_FILL_X);
-
-		// Button to clear
-		//new FXButton(buttonFrame, "&Clear", NULL, this, ID_CLEAR, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
-
-		//new FXButton(buttonFrame, "&New", NULL, this, ID_NEW, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
-
-		// Exit button
-		//new FXButton(buttonFrame, "&Exit", NULL, this, FXApp::ID_QUIT, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
-
-		// RIGHT pane to contain the canvas
-
-
-		// Label above the canvas
-		//new FXLabel(canvasFrame, "Room Grid", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
-
-		// Horizontal divider line
-		//new FXHorizontalSeparator(canvasFrame, SEPARATOR_GROOVE | LAYOUT_FILL_X);
-
-
-		// Drawing canvas
-
-
-
 	// Status bar
 	statusbar = new FXStatusBar(this, LAYOUT_SIDE_BOTTOM | LAYOUT_FILL_X | STATUSBAR_WITH_DRAGCORNER | FRAME_RAISED);
 
@@ -154,8 +120,6 @@ void ProjectWindow::create() {
 	filemenu->create();
 	// Make the main window appear
 	show(PLACEMENT_SCREEN);
-
-
 
 }
 
@@ -380,8 +344,14 @@ FXbool ProjectWindow::saveFile(const FXString& file) {
 
 	getApp()->beginWaitCursor();
 
-	// Save data to the file
-	project->get_saveData(stream);
+	// Save project data to the file
+	//stream->saveObject(project);
+
+	//save placeables to the file
+	for (int i = 0; i < project->get_placeableCount(); i++) {
+		//project->placeables[i]->save(stream);
+	}
+
 	stream.close();
 
 
@@ -446,7 +416,7 @@ FXbool ProjectWindow::loadFile(const FXString& file) {
 	// Set wait cursor
 	getApp()->beginWaitCursor();
 
-	project->loadProject(stream);
+	//project->load(stream);
 
 
 
@@ -457,7 +427,7 @@ FXbool ProjectWindow::loadFile(const FXString& file) {
 	filetime = FXStat::modified(file);
 	filenameset = TRUE;
 	filename = file;
-	setTitle("SketchList 2D Room Designer - " + project->get_gridSize());
+	setTitle("SketchList 2D Room Designer - " + file);
 
 	return TRUE;
 }
