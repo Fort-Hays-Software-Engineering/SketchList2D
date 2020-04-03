@@ -14,16 +14,24 @@ Placeable::Placeable(int x, int y, int h, int w)
 	yPos = y;
 	height = h;
 	width = w;
+	rectangle = new FXRectangle(x, y, w, h);
+}
+
+FXRectangle * Placeable::get_rectangle()
+{
+	return rectangle;
 }
 
 void Placeable::set_xPos(int newX)
 {
 	xPos = newX;
+	rectangle->x = newX;
 }
 
 void Placeable::set_yPos(int newY)
 {
 	yPos = newY;
+	rectangle->y = newY;
 }
 
 int Placeable::get_xPos()
