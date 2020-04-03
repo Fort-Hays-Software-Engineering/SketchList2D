@@ -79,6 +79,7 @@ protected:
 	FXString unique() const;
 	ProjectWindow *findWindow(const FXString& file) const;
 	FXIcon *newicon;
+
 public:
 
 	// Message handlers

@@ -44,8 +44,10 @@ public:
 	long onCmdNewProject(FXObject*, FXSelector, void*);
 	//Open project
 	long onCmdOpen(FXObject*, FXSelector, void*);
-	//Open Recent Project
+	//Open Recent Project from file menu
 	long onCmdOpenRecent(FXObject*, FXSelector, void* ptr);
+	//Open Recent Project from ListBox
+	long onCmdLoadRecent(FXObject*, FXSelector, void* ptr);
 
 	FXApp* getApp() const { return (FXApp*)FXMainWindow::getApp(); }
 
@@ -60,7 +62,8 @@ public:
 		ID_OPEN,
 		ID_NEWPROJECT,
 		ID_LAST,
-		ID_OPEN_RECENT
+		ID_OPEN_RECENT,
+		ID_LOADRECENT
 	};
 
 public:

@@ -34,6 +34,7 @@ FXIMPLEMENT(ProjectWindow, FXMainWindow, ProjectWindowMap, ARRAYNUMBER(ProjectWi
 
 // Construct a ProjectWindow
 ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Designer", NULL, NULL, DECOR_ALL, 0, 0, 800, 600), mrufiles(a) {
+
 	// Add to list of windows
 	//getApp()->windowlist.append(this);
 	project = new Project();
@@ -392,7 +393,7 @@ FXbool ProjectWindow::saveFile(const FXString& file) {
 	filenameset = TRUE;
 	filename = file;
 	setTitle("SketchList 2D Room Designer - " + file);
-
+	getApp()->reg().write();
 	return TRUE;
 }
 
@@ -410,7 +411,7 @@ long ProjectWindow::onCmdOpen(FXObject*, FXSelector, void*) {
 		window->loadFile(file);
 		window->raise();
 		window->setFocus();
-
+		
 	}
 	return 1;
 }
@@ -438,7 +439,7 @@ FXbool ProjectWindow::loadFile(const FXString& file) {
 	filenameset = TRUE;
 	filename = file;
 	setTitle("SketchList 2D Room Designer - " + file);
-
+	getApp()->reg().write();
 	return TRUE;
 }
 
@@ -474,6 +475,8 @@ long ProjectWindow::onUpdClear(FXObject* sender, FXSelector, void*) {
 
 FXbool ProjectWindow::close(FXbool notify) {
 	// Perform normal close stuff
+
+
 	return FXMainWindow::close(notify);
 }
 

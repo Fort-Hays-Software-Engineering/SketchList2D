@@ -14,6 +14,8 @@ FXDEFMAP(SplashWindow) SplashWindowMap[] = {
 	FXMAPFUNC(SEL_COMMAND,           SplashWindow::ID_NEWPROJECT,    SplashWindow::onCmdNewProject),
 	FXMAPFUNC(SEL_COMMAND,           SplashWindow::ID_OPEN,			 SplashWindow::onCmdOpen),
 	FXMAPFUNC(SEL_COMMAND,           SplashWindow::ID_OPEN_RECENT,	 SplashWindow::onCmdOpenRecent),
+	FXMAPFUNC(SEL_COMMAND,           SplashWindow::ID_LOADRECENT,	 SplashWindow::onCmdLoadRecent),
+	FXMAPFUNC(SEL_DOUBLECLICKED,     SplashWindow::ID_LOADRECENT,	 SplashWindow::onCmdLoadRecent),
 };
 
 
@@ -45,25 +47,25 @@ SplashWindow::SplashWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Design
 	existingProjectList = new FXHorizontalFrame(loadProjectFrame, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 90, 0, 0, 0, 0, 0);
 
 	
-	recentList = new FXList(loadProjectFrame, &mrufiles, FXRecentFiles::ID_ANYFILES, LIST_NORMAL | LAYOUT_FILL_X, 0, 0, 0, 0);
+	recentList = new FXList(loadProjectFrame, this, ID_LOADRECENT, LIST_NORMAL | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0);
 	recentList->setListStyle(LIST_SINGLESELECT);
-	recentList->appendItem(mrufiles.getFile(1));
-	recentList->appendItem(mrufiles.getFile(2));
-	recentList->appendItem(mrufiles.getFile(3));
-	recentList->appendItem(mrufiles.getFile(4));
-	recentList->appendItem(mrufiles.getFile(5));
-	recentList->appendItem(mrufiles.getFile(6));
-	recentList->appendItem(mrufiles.getFile(7));
-	recentList->appendItem(mrufiles.getFile(8));
-	recentList->appendItem(mrufiles.getFile(9));
-	recentList->appendItem(mrufiles.getFile(10));
+	recentList->appendItem(FXPath::name(mrufiles.getFile(1)));
+	recentList->appendItem(FXPath::name(mrufiles.getFile(2)));
+	recentList->appendItem(FXPath::name(mrufiles.getFile(3)));
+	recentList->appendItem(FXPath::name(mrufiles.getFile(4)));
+	recentList->appendItem(FXPath::name(mrufiles.getFile(5)));
+	recentList->appendItem(FXPath::name(mrufiles.getFile(6)));
+	recentList->appendItem(FXPath::name(mrufiles.getFile(7)));
+	recentList->appendItem(FXPath::name(mrufiles.getFile(8)));
+	recentList->appendItem(FXPath::name(mrufiles.getFile(9)));
+	recentList->appendItem(FXPath::name(mrufiles.getFile(10)));
 	
 
 
 	
 
 	
-	new FXButton(loadProjectFrame, "&Load", NULL, this, ID_CLEAR, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
+	new FXButton(loadProjectFrame, "&Load", NULL, this, ID_LOADRECENT, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
 
 
 
@@ -157,9 +159,21 @@ long SplashWindow::onCmdOpen(FXObject*, FXSelector, void*) {
 		return 1;
 	}
 
-// Open recent file
+// Open recent file - File Menu
 long SplashWindow::onCmdOpenRecent(FXObject*, FXSelector, void* ptr) {
 	FXString file = (const char*)ptr;
+	ProjectWindow *window = new ProjectWindow(getApp());
+	window->create();
+	window->loadFile(file);
+	window->raise();
+	window->setFocus();
+	return 1;
+}
+
+// Open recent file - Recent Project Menu ListBox
+long SplashWindow::onCmdLoadRecent(FXObject*, FXSelector, void* ptr) {
+	FXint curSel = recentList->getCurrentItem() + 1; // Index in recent files start at 1 instead of zero
+	FXString file = mrufiles.getFile(curSel);
 	ProjectWindow *window = new ProjectWindow(getApp());
 	window->create();
 	window->loadFile(file);

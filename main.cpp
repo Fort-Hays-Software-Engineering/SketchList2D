@@ -4,8 +4,9 @@
 
 int main(int argc, char *argv[]) {
 
+
 	// Make application
-	FXApp application("SketchList", "FoxTest");
+	FXApp application("SketchList", "SketchListRD");
 
 	// Start app
 	application.init(argc, argv);
