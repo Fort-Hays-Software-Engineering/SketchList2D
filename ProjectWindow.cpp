@@ -60,7 +60,7 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 
 	heightFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(heightFrame, "Height", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
-	heightText = new FXTextField(heightFrame, NULL, 0, TEXTFIELD_INTEGER);
+	heightText = new FXTextField(heightFrame, 5, NULL, 0, TEXTFIELD_INTEGER);
 
 	unitsFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	feetRadio = new FXRadioButton(unitsFrame, "Feet");
@@ -125,7 +125,20 @@ void ProjectWindow::create() {
 
 long ProjectWindow::onCmdNewPlacable(FXObject*, FXSelector, void*) {
 	FXDCWindow dc(canvas); //get the canvas
-	project->addPlaceable(20, 20, 100, 50); //add a new placeable to the project
+	switch (placeableTypeComboBox->getCurrentItem()) {
+	case 0:
+		project->addPlaceable(project->get_gridSize(), project->get_gridSize(), 500, 5);
+		break;
+	case 1:
+		project->addPlaceable(project->get_gridSize(), project->get_gridSize(), 5, 500);
+		break;
+	case 2:
+		project->addPlaceable(project->get_gridSize(), project->get_gridSize(), 50, 50);
+		break;
+	default:
+		break;
+
+	}
 	drawScreen(); //redraw the screen
 	return 1;
 }
@@ -204,6 +217,25 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 // The mouse has moved, and a placeable is selected, move it
 long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 	FXEvent *ev = (FXEvent*)ptr;
+	/* Experiment in snapping to grid
+	int grid = project->get_gridSize();
+	if (itemClicked == 1 && mdflag == 1 && currentSelection != NULL) {
+
+		if (ev->win_x - ev->last_x > 0){
+			project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() + grid);
+		}
+		else if (ev->win_x - ev->last_x < 0) {
+			project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() - grid);
+		}
+		if (ev->win_y - ev->last_y > 0) {
+			project->placeables[currentIndex]->set_yPos(project->placeables[currentIndex]->get_yPos() + grid);
+		}
+		else if (ev->win_y - ev->last_y < 0) {
+			project->placeables[currentIndex]->set_yPos(project->placeables[currentIndex]->get_yPos() - grid);
+		}
+		drawScreen();
+	}
+	*/
 	
 	if (currentSelection != NULL) {
 		if (itemClicked == 1 && mdflag == 1) {
@@ -212,7 +244,7 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 			drawScreen();
 		}
 	}
-
+	
 	return 1;
 }
 
