@@ -125,7 +125,7 @@ void ProjectWindow::create() {
 
 long ProjectWindow::onCmdNewPlacable(FXObject*, FXSelector, void*) {
 	FXDCWindow dc(canvas); //get the canvas
-	project->addPlaceable(20, 20, 50, 50); //add a new placeable to the project
+	project->addPlaceable(20, 20, 100, 50); //add a new placeable to the project
 	drawScreen(); //redraw the screen
 	return 1;
 }
@@ -153,7 +153,7 @@ void ProjectWindow::drawScreen()
 
 	//draw placeables
 	for (int i = 0; i < project->get_placeableCount(); i++) {
-		dc.drawRectangle(project->placeables[i]->get_xPos(), project->placeables[i]->get_yPos(), project->placeables[i]->get_height(), project->placeables[i]->get_width());
+		dc.drawRectangles(project->placeables[i]->get_rectangle(), 1);
 	}
 	if(currentSelection != NULL)
 		drawControlHandles();
@@ -168,28 +168,24 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 	clickX = ev->click_x;
 	clickY = ev->click_y;
 
+	int xStart, xEnd, yStart, yEnd;
+
 	FXDCWindow dc(canvas);
 	if (mdflag == 0) {
 
 
 		//iterate through placeables seeing if this position is inside one of the rectangles
 		for (int i = 0; i < project->get_placeableCount(); i++) {
-			int xStart = project->placeables[i]->get_xPos();
-			int xEnd = xStart + project->placeables[i]->get_width();
-			int yStart = project->placeables[i]->get_yPos();
-			int yEnd = xStart + project->placeables[i]->get_height();
+			FXRectangle *rect = project->placeables[i]->get_rectangle();
 
-			if (clickX >= xStart && clickY >= yStart && clickX <= xEnd && clickY <= yEnd) {
-				//assign clicked placeable to pointer to keep track of it
+			if (rect->contains(clickX, clickY)) {
 				currentSelection = project->placeables[i];
-				//heightText->setText(""+ project->placeables[i]->get_height());
-				heightText->setText("");
-				widthText->setText("");
-				//draw control handles
+				currentIndex = i;
 				drawScreen();
 				itemClicked = 1;
 				mdflag = 1;
 				return 1;
+
 			}
 
 		}
@@ -208,10 +204,11 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 // The mouse has moved, and a placeable is selected, move it
 long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 	FXEvent *ev = (FXEvent*)ptr;
+	
 	if (currentSelection != NULL) {
 		if (itemClicked == 1 && mdflag == 1) {
-			currentSelection->set_xPos(currentSelection->get_xPos() + ev->win_x - ev->last_x);
-			currentSelection->set_yPos(currentSelection->get_yPos() + ev->win_y - ev->last_y);
+			project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() + ev->win_x - ev->last_x);
+			project->placeables[currentIndex]->set_yPos(project->placeables[currentIndex]->get_yPos() + ev->win_y - ev->last_y);
 			drawScreen();
 		}
 	}
@@ -229,7 +226,7 @@ long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
 
 		// Mouse no longer down
 		mdflag = 0;
-		itemClicked = 0;
+		itemClicked = 1;
 	}
 	return 1;
 }
@@ -238,22 +235,13 @@ long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
 void ProjectWindow::drawControlHandles()
 {
 	FXDCWindow dc(canvas);
-	int xStart = currentSelection->get_xPos();
-	int xEnd = xStart + currentSelection->get_width();
-	int yStart = currentSelection->get_yPos();
-	int yEnd = xStart + currentSelection->get_height();
-	//top left
-	dc.drawLine(xStart - 5, yStart - 5, xStart - 5, yStart);
-	dc.drawLine(xStart - 5, yStart - 5, xStart, yStart - 5);
-	//top right
-	dc.drawLine(xEnd + 5, yStart - 5, xEnd + 5, yStart);
-	dc.drawLine(xEnd + 5, yStart - 5, xEnd, yStart - 5);
-	//bottom left
-	dc.drawLine(xStart - 5, yEnd + 5, xStart - 5, yEnd);
-	dc.drawLine(xStart - 5, yEnd + 5, xStart, yEnd + 5);
-	//bottom right
-	dc.drawLine(xEnd + 5, yEnd + 5, xEnd + 5, yEnd);
-	dc.drawLine(xEnd + 5, yEnd + 5, xEnd, yEnd + 5);
+
+	dc.drawFocusRectangle(project->placeables[currentIndex]->get_xPos()-5,
+						  project->placeables[currentIndex]->get_yPos()-5,
+						  project->placeables[currentIndex]->get_width()+10,
+						  project->placeables[currentIndex]->get_height()+10);
+	
+	
 
 }
 

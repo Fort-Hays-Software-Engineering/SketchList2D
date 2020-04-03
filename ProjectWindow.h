@@ -60,6 +60,7 @@ private:
 	Project* project;
 
 	Placeable *currentSelection;
+	int currentIndex;
 	void drawControlHandles();
 
 protected:
