@@ -24,6 +24,7 @@ FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
 	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_SAVEAS,			ProjectWindow::onCmdSaveAs),
 	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPROJECT,		ProjectWindow::onCmdNewProject),
 	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPLACEABLE,	ProjectWindow::onCmdNewPlacable),
+	FXMAPFUNC(SEL_COMMAND,			 ProjectWindow::ID_GRIDSIZE,		ProjectWindow::onCmdGridSize),
 };
 
 
@@ -58,11 +59,11 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 
 	widthFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(widthFrame, "Width", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
-	widthText = new FXTextField(widthFrame, 5, NULL, 0, TEXTFIELD_INTEGER);
+	widthText = new FXTextField(widthFrame, 5, NULL, 0, TEXTFIELD_INTEGER | FRAME_LINE);
 
 	heightFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(heightFrame, "Height", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
-	heightText = new FXTextField(heightFrame, 5, NULL, 0, TEXTFIELD_INTEGER);
+	heightText = new FXTextField(heightFrame, 5, NULL, 0, TEXTFIELD_INTEGER | FRAME_LINE);
 
 	unitsFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	feetRadio = new FXRadioButton(unitsFrame, "Feet");
@@ -76,6 +77,10 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	new FXLabel(cabinetFrame, "Cabinet", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
 	cabinet = new FXText(cabinetFrame);
 
+	new FXLabel(LeftPanel, "Grid Size", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
+	gridSizeSlider = new FXSlider(LeftPanel, this, ID_GRIDSIZE, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0);
+	gridSizeSlider->setRange(1, 100);
+	gridSizeSlider->setIncrement(10);
 
 	// Status bar
 	statusbar = new FXStatusBar(this, LAYOUT_SIDE_BOTTOM | LAYOUT_FILL_X | STATUSBAR_WITH_DRAGCORNER | FRAME_RAISED);
@@ -337,6 +342,16 @@ long ProjectWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 	window->create();
 	window->raise();
 	window->setFocus();
+	return 1;
+}
+
+// Change Grid Size With Slider
+long ProjectWindow::onCmdGridSize(FXObject*, FXSelector, void*) {
+	FXint grid = gridSizeSlider->getValue();
+
+	project->set_gridSize(grid);
+	drawScreen();
+
 	return 1;
 }
 

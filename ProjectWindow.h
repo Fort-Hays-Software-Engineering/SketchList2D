@@ -41,7 +41,9 @@ private:
 	FXRadioButton     *inchRadio;
 
 	FXHorizontalFrame *heightFrame;             // height frame of the data panel
-	FXTextField            *heightText;
+	FXTextField       *heightText;
+
+	FXSlider		  *gridSizeSlider;			// Slider selector for adjustable grid Size
 
 	FXVerticalFrame   *createNewProjectFrame;   // Create New Project label and button
 	FXVerticalFrame   *loadProjectFrame;        // Splash screen load new project frame
@@ -107,6 +109,8 @@ public:
 
 	FXApp* getApp() const { return (FXApp*)FXMainWindow::getApp(); }
 
+	long onCmdGridSize(FXObject*, FXSelector, void*);
+
 public:
 
 	// Messages for our class
@@ -122,7 +126,8 @@ public:
 		ID_CABINET,
 		ID_VIEWBOM,
 		ID_LAST,
-		ID_OPEN_RECENT
+		ID_OPEN_RECENT,
+		ID_GRIDSIZE
 	};
 
 public:
