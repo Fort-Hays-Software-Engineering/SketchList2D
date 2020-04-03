@@ -12,6 +12,7 @@ FXDEFMAP(SplashWindow) SplashWindowMap[] = {
 
 	//________Message_Type_____________________ID____________Message_Handler_______
 	FXMAPFUNC(SEL_COMMAND,           SplashWindow::ID_NEWPROJECT,    SplashWindow::onCmdNewProject),
+	FXMAPFUNC(SEL_COMMAND,           SplashWindow::ID_OPEN,			 SplashWindow::onCmdOpen),
 };
 
 
@@ -81,11 +82,29 @@ long SplashWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 	ProjectWindow *window = new ProjectWindow(getApp());
 	window->create();
 	window->raise();
+
 	window->setFocus();
 
 
 	return 1;
 }
+
+long SplashWindow::onCmdOpen(FXObject*, FXSelector, void*) {
+		FXFileDialog opendialog(this, tr("Open Document"));
+		opendialog.setSelectMode(SELECTFILE_EXISTING);
+		opendialog.setPatternList("Project Files(*.pjt)\nAll Files (*)");
+		opendialog.setCurrentPattern(0);
+		//opendialog.setDirectory(FXPath::directory(filename));
+		if (opendialog.execute()) {
+			ProjectWindow *window = new ProjectWindow(getApp());
+			FXString file = opendialog.getFilename();
+			window->create();
+			window->loadFile(file);
+			window->raise();
+			window->setFocus();
+		}
+		return 1;
+	}
 
 
 FXbool SplashWindow::close(FXbool notify) {

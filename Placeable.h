@@ -23,6 +23,9 @@ public:
 	void set_width(int newWidth);
 	int get_height();
 	int get_width();
+
+	void save(FXStream& stream); // Serialize placeable data for save file
+
 	~Placeable() {};
 };
 

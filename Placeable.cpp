@@ -53,3 +53,9 @@ int Placeable::get_width()
 {
 	return width;
 }
+
+void Placeable::save(FXStream& stream)
+{
+
+	stream << xPos << yPos << height << width ;        
+}

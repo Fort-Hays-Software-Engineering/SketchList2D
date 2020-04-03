@@ -303,7 +303,7 @@ long ProjectWindow::onCmdSaveAs(FXObject*, FXSelector, void*) {
 	FXFileDialog savedialog(getApp(), tr("Save Project"));
 	FXString file = filename;
 	savedialog.setSelectMode(SELECTFILE_ANY);
-	savedialog.setPatternList("All Files (*)");
+	savedialog.setPatternList("Project Files(*.pjt)\nAll Files (*)");
 	savedialog.setCurrentPattern(0);
 	savedialog.setFilename(file);
 	if (savedialog.execute()) {
@@ -319,6 +319,7 @@ long ProjectWindow::onCmdSaveAs(FXObject*, FXSelector, void*) {
 // Save file
 FXbool ProjectWindow::saveFile(const FXString& file) {
 	FXFileStream  stream;
+	
 	// Save stuff to a FILE stream
 
 
@@ -333,12 +334,7 @@ FXbool ProjectWindow::saveFile(const FXString& file) {
 	getApp()->beginWaitCursor();
 
 	// Save project data to the file
-	//stream->saveObject(project);
-
-	//save placeables to the file
-	for (int i = 0; i < project->get_placeableCount(); i++) {
-		//project->placeables[i]->save(stream);
-	}
+	project->save(stream);
 
 	stream.close();
 
@@ -363,27 +359,13 @@ long ProjectWindow::onCmdOpen(FXObject*, FXSelector, void*) {
 	opendialog.setCurrentPattern(0);
 	opendialog.setDirectory(FXPath::directory(filename));
 	if (opendialog.execute()) {
-
+		ProjectWindow *window = new ProjectWindow(getApp());
 		FXString file = opendialog.getFilename();
+		window->create();
+		window->loadFile(file);
+		window->raise();
+		window->setFocus();
 
-		//window->isSplashScreen = 0;
-		//window->create();
-		loadFile(file);
-		//window->raise();
-		//window->setFocus();
-
-		/*if (!window) {
-			window = findUnused();
-			if (!window) {
-				window = new TextWindow(getApp(), unique());
-				window->create();
-			}
-			project->loadFile(file);
-			window->readBookmarks(file);
-			window->readView(file);
-		}*/
-		//window->raise();
-		//window->setFocus();
 	}
 	return 1;
 }
@@ -405,9 +387,12 @@ FXbool ProjectWindow::loadFile(const FXString& file) {
 	getApp()->beginWaitCursor();
 
 	//project->load(stream);
+	// Save project data to the file
+	project->load(stream);
 
 
 
+	drawScreen();
 	// Kill wait cursor
 	getApp()->endWaitCursor();
 

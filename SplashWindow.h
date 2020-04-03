@@ -34,14 +34,14 @@ protected:
 	FXToolBarShell      *dragshell1;              // Shell for floating menubar
 
 protected:
-	FXString unique() const;
-	SplashWindow *findWindow(const FXString& file) const;
+
 	FXIcon *newicon;
 public:
 
 	//create a new project
 	long onCmdNewProject(FXObject*, FXSelector, void*);
-
+	//Open project
+	long onCmdOpen(FXObject*, FXSelector, void*);
 	FXApp* getApp() const { return (FXApp*)FXMainWindow::getApp(); }
 
 
@@ -69,6 +69,9 @@ public:
 	// Close the window, return TRUE if actually closed
 	virtual FXbool close(FXbool notify = FALSE);
 	//SplashWindow* getApp() const { return (SplashWindow*)FXMainWindow::getApp(); }
+
+	// File Management functions
+	FXbool loadFile(const FXString& file);
 
 	virtual ~SplashWindow();
 };

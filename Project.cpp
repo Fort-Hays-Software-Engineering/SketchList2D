@@ -2,6 +2,7 @@
 #include "Placeable.h"
 #include "fx.h"
 
+
 Project::Project()
 {
 	gridSize = 16; //one inch (16 1/16ths of an inch)
@@ -19,23 +20,37 @@ int Project::get_gridSize()
 	return gridSize;
 }
 
-/*void Project::get_saveData(FXStream& stream)
+void Project::save(FXStream& stream)
 {
-	
+
+
 	// Save my stuff to a stream
-	numdata = 1;                 // number of total data values being serialized
-	stream << numdata;           // Save the number of data values
-	stream << gridSize;
+
+	stream << gridSize;             // Save the number of data values
+	stream << placeableCount;		// save number of placeables
+
+	// Serialize and Save placeables
+	for (int i = 0; i < placeableCount; i++) {
+		placeables[i]->save(stream);
+	}
 }
 
-void Project::loadProject(FXStream& stream)
+void Project::load(FXStream& stream)
 {
-
+	FXint pc, x, y, h, w;
 	// Load my stuff from a stream
-								 // number of total data values being serialized
-	stream >> numdata;           // Save the number of data values
+	
 	stream >> gridSize;
-}*/
+	stream >> placeableCount;
+
+	// load placeables
+	for (int i = 0; i < placeableCount; i++) {
+		
+		stream >> x >> y >> h >> w;
+		placeables[i] = new Placeable(x, y, h, w);
+		x = y = h = w = NULL;
+	}
+}
 
 void Project::addPlaceable(int x, int y, int h, int w)
 {
