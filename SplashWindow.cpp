@@ -13,6 +13,7 @@ FXDEFMAP(SplashWindow) SplashWindowMap[] = {
 	//________Message_Type_____________________ID____________Message_Handler_______
 	FXMAPFUNC(SEL_COMMAND,           SplashWindow::ID_NEWPROJECT,    SplashWindow::onCmdNewProject),
 	FXMAPFUNC(SEL_COMMAND,           SplashWindow::ID_OPEN,			 SplashWindow::onCmdOpen),
+	FXMAPFUNC(SEL_COMMAND,           SplashWindow::ID_OPEN_RECENT,	 SplashWindow::onCmdOpenRecent),
 };
 
 
@@ -22,7 +23,7 @@ FXIMPLEMENT(SplashWindow, FXMainWindow, SplashWindowMap, ARRAYNUMBER(SplashWindo
 
 
 // Construct a SplashWindow
-SplashWindow::SplashWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Designer", NULL, NULL, DECOR_ALL, 0, 0, 800, 600) {
+SplashWindow::SplashWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Designer", NULL, NULL, DECOR_ALL, 0, 0, 800, 600),mrufiles(a) {
 	// Add to list of windows
 	//getApp()->windowlist.append(this);
 
@@ -42,6 +43,26 @@ SplashWindow::SplashWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Design
 	loadProjectFrame = new FXVerticalFrame(middleSplashFrame, FRAME_SUNKEN | LAYOUT_FILL_Y | LAYOUT_TOP | LAYOUT_RIGHT, 0, 0, 0, 0, 10, 10, 10, 10);
 	new FXLabel(loadProjectFrame, "Pick Up Where You Left Off", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
 	existingProjectList = new FXHorizontalFrame(loadProjectFrame, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 90, 0, 0, 0, 0, 0);
+
+	
+	recentList = new FXList(loadProjectFrame, &mrufiles, FXRecentFiles::ID_ANYFILES, LIST_NORMAL | LAYOUT_FILL_X, 0, 0, 0, 0);
+	recentList->setListStyle(LIST_SINGLESELECT);
+	recentList->appendItem(mrufiles.getFile(1));
+	recentList->appendItem(mrufiles.getFile(2));
+	recentList->appendItem(mrufiles.getFile(3));
+	recentList->appendItem(mrufiles.getFile(4));
+	recentList->appendItem(mrufiles.getFile(5));
+	recentList->appendItem(mrufiles.getFile(6));
+	recentList->appendItem(mrufiles.getFile(7));
+	recentList->appendItem(mrufiles.getFile(8));
+	recentList->appendItem(mrufiles.getFile(9));
+	recentList->appendItem(mrufiles.getFile(10));
+	
+
+
+	
+
+	
 	new FXButton(loadProjectFrame, "&Load", NULL, this, ID_CLEAR, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
 
 
@@ -56,10 +77,40 @@ SplashWindow::SplashWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Design
 	// File Menu entries
 	new FXMenuCommand(filemenu, tr("&New Project...\tCtl-N\tCreate new document."), NULL, this, ID_NEWPROJECT);
 	new FXMenuCommand(filemenu, tr("&Open Project...\tCtl-O\tOpen document file."), NULL, this, ID_OPEN);
-	new FXMenuSeparator(filemenu);
+	
+
+	// Recent file menu; this automatically hides if there are no files
+	FXMenuSeparator* sep1 = new FXMenuSeparator(filemenu);
+	sep1->setTarget(&mrufiles);
+	sep1->setSelector(FXRecentFiles::ID_ANYFILES);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_1);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_2);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_3);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_4);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_5);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_6);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_7);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_8);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_9);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_10);
+	new FXMenuCommand(filemenu, tr("&Clear Recent Files"), NULL, &mrufiles, FXRecentFiles::ID_CLEAR);
+	FXMenuSeparator* sep2 = new FXMenuSeparator(filemenu);
+	sep2->setTarget(&mrufiles);
+	sep2->setSelector(FXRecentFiles::ID_ANYFILES);
+
 	new FXMenuCommand(filemenu, tr("&Exit...\tAlt-F4\tExit Program."), NULL, this, FXApp::ID_QUIT);
 
+	// Recent files
+	mrufiles.setTarget(this);
+	mrufiles.setSelector(ID_OPEN_RECENT);
+
+
+	
+
+
+
 }
+
 
 
 SplashWindow::~SplashWindow() {
@@ -106,6 +157,18 @@ long SplashWindow::onCmdOpen(FXObject*, FXSelector, void*) {
 		return 1;
 	}
 
+// Open recent file
+long SplashWindow::onCmdOpenRecent(FXObject*, FXSelector, void* ptr) {
+	FXString file = (const char*)ptr;
+	ProjectWindow *window = new ProjectWindow(getApp());
+	window->create();
+	window->loadFile(file);
+	window->raise();
+	window->setFocus();
+	return 1;
+}
+
+
 
 FXbool SplashWindow::close(FXbool notify) {
 	// Perform normal close stuff
@@ -118,3 +181,5 @@ void SplashWindow::detach() {
 	dragshell1->detach();
 	urilistType = 0;
 }
+
+

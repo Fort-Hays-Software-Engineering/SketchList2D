@@ -12,17 +12,18 @@
 FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
 
 	//________Message_Type_____________________ID____________Message_Handler_______
-	FXMAPFUNC(SEL_PAINT,             ProjectWindow::ID_CANVAS, ProjectWindow::onPaint),
-	FXMAPFUNC(SEL_LEFTBUTTONPRESS,   ProjectWindow::ID_CANVAS, ProjectWindow::onMouseDown),
-	FXMAPFUNC(SEL_LEFTBUTTONRELEASE, ProjectWindow::ID_CANVAS, ProjectWindow::onMouseUp),
-	FXMAPFUNC(SEL_MOTION,            ProjectWindow::ID_CANVAS, ProjectWindow::onMouseMove),
-	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_CLEAR,  ProjectWindow::onCmdClear),
-	FXMAPFUNC(SEL_UPDATE,            ProjectWindow::ID_CLEAR,  ProjectWindow::onUpdClear),
-	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_OPEN,   ProjectWindow::onCmdOpen),
-	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_SAVE,   ProjectWindow::onCmdSave),
-	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_SAVEAS,   ProjectWindow::onCmdSaveAs),
-	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPROJECT,    ProjectWindow::onCmdNewProject),
-	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPLACEABLE,    ProjectWindow::onCmdNewPlacable),
+	FXMAPFUNC(SEL_PAINT,             ProjectWindow::ID_CANVAS,			ProjectWindow::onPaint),
+	FXMAPFUNC(SEL_LEFTBUTTONPRESS,   ProjectWindow::ID_CANVAS,			ProjectWindow::onMouseDown),
+	FXMAPFUNC(SEL_LEFTBUTTONRELEASE, ProjectWindow::ID_CANVAS,			ProjectWindow::onMouseUp),
+	FXMAPFUNC(SEL_MOTION,            ProjectWindow::ID_CANVAS,			ProjectWindow::onMouseMove),
+	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_CLEAR,			ProjectWindow::onCmdClear),
+	FXMAPFUNC(SEL_UPDATE,            ProjectWindow::ID_CLEAR,			ProjectWindow::onUpdClear),
+	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_OPEN,			ProjectWindow::onCmdOpen),
+	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_OPEN_RECENT,		ProjectWindow::onCmdOpenRecent),
+	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_SAVE,			ProjectWindow::onCmdSave),
+	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_SAVEAS,			ProjectWindow::onCmdSaveAs),
+	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPROJECT,		ProjectWindow::onCmdNewProject),
+	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPLACEABLE,	ProjectWindow::onCmdNewPlacable),
 };
 
 
@@ -32,7 +33,7 @@ FXIMPLEMENT(ProjectWindow, FXMainWindow, ProjectWindowMap, ARRAYNUMBER(ProjectWi
 
 
 // Construct a ProjectWindow
-ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Designer", NULL, NULL, DECOR_ALL, 0, 0, 800, 600) {
+ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Designer", NULL, NULL, DECOR_ALL, 0, 0, 800, 600), mrufiles(a) {
 	// Add to list of windows
 	//getApp()->windowlist.append(this);
 	project = new Project();
@@ -87,7 +88,28 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	new FXMenuCommand(filemenu, tr("&Open Project...\tCtl-O\tOpen Project File."), NULL, this, ID_OPEN);
 	new FXMenuCommand(filemenu, tr("&Save Project...\tCtl-S\tSave Project."), NULL, this, ID_SAVE);
 	new FXMenuCommand(filemenu, tr("&Save Project As...\tCtl-D\tSave Project As."), NULL, this, ID_SAVEAS);
-	new FXMenuSeparator(filemenu);
+
+
+	// Recent file menu; this automatically hides if there are no files
+	FXMenuSeparator* sep1 = new FXMenuSeparator(filemenu);
+	sep1->setTarget(&mrufiles);
+	sep1->setSelector(FXRecentFiles::ID_ANYFILES);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_1);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_2);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_3);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_4);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_5);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_6);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_7);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_8);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_9);
+	new FXMenuCommand(filemenu, FXString::null, NULL, &mrufiles, FXRecentFiles::ID_FILE_10);
+	new FXMenuCommand(filemenu, tr("&Clear Recent Files"), NULL, &mrufiles, FXRecentFiles::ID_CLEAR);
+	FXMenuSeparator* sep2 = new FXMenuSeparator(filemenu);
+	sep2->setTarget(&mrufiles);
+	sep2->setSelector(FXRecentFiles::ID_ANYFILES);
+
+
 	new FXMenuCommand(filemenu, tr("&View Materials and Pricing\tCtl-B."), NULL, this, ID_VIEWBOM);
 	new FXMenuSeparator(filemenu);
 	new FXMenuCommand(filemenu, tr("&Exit\tAlt-F4\tExit Program."), NULL, this, FXApp::ID_QUIT);
@@ -98,7 +120,9 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	dirty = 0;
 	itemClicked = 0;
 
-
+	// Recent files
+	mrufiles.setTarget(this);
+	mrufiles.setSelector(ID_OPEN_RECENT);
 }
 
 void configurePlaceableComboBox(FXComboBox *comboBox) {
@@ -312,9 +336,6 @@ long ProjectWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 	window->create();
 	window->raise();
 	window->setFocus();
-
-
-
 	return 1;
 }
 
@@ -324,11 +345,7 @@ long ProjectWindow::onCmdSave(FXObject* sender, FXSelector sel, void* ptr) {
 
 	saveFile(filename);
 	return 1;
-
-
 }
-
-
 
 // Save As
 long ProjectWindow::onCmdSaveAs(FXObject*, FXSelector, void*) {
@@ -364,17 +381,14 @@ FXbool ProjectWindow::saveFile(const FXString& file) {
 	}
 
 	getApp()->beginWaitCursor();
-
 	// Save project data to the file
 	project->save(stream);
-
 	stream.close();
-
-
 	// Kill wait cursor
 	getApp()->endWaitCursor();
 
 	// Set stuff
+	mrufiles.appendFile(file);
 	filenameset = TRUE;
 	filename = file;
 	setTitle("SketchList 2D Room Designer - " + file);
@@ -382,8 +396,7 @@ FXbool ProjectWindow::saveFile(const FXString& file) {
 	return TRUE;
 }
 
-// Open file code from adie ---- not yet adapted
-
+// Open project file
 long ProjectWindow::onCmdOpen(FXObject*, FXSelector, void*) {
 	FXFileDialog opendialog(this, tr("Open Document"));
 	opendialog.setSelectMode(SELECTFILE_EXISTING);
@@ -402,39 +415,42 @@ long ProjectWindow::onCmdOpen(FXObject*, FXSelector, void*) {
 	return 1;
 }
 
-// Load file
+// Load project file
 FXbool ProjectWindow::loadFile(const FXString& file) {
 	FXFileStream  stream;
-
-
 	FXTRACE((100, "loadFile(%s)\n", file.text()));
-
 	// Opened file?
 	if (!stream.open(file, FXStreamLoad)) {
 		FXMessageBox::error(this, MBOX_OK, tr("Error Saving Project File"), tr("Unable to open file: %s"), file.text());
 		return FALSE;
 	}
-
 	// Set wait cursor
 	getApp()->beginWaitCursor();
-
 	//project->load(stream);
 	// Save project data to the file
 	project->load(stream);
-
-
-
 	drawScreen();
 	// Kill wait cursor
 	getApp()->endWaitCursor();
-
 	// Set stuff
+	mrufiles.appendFile(file);
 	filetime = FXStat::modified(file);
 	filenameset = TRUE;
 	filename = file;
 	setTitle("SketchList 2D Room Designer - " + file);
 
 	return TRUE;
+}
+
+// Open recent file
+long ProjectWindow::onCmdOpenRecent(FXObject*, FXSelector, void* ptr) {
+	FXString file = (const char*)ptr;
+	ProjectWindow *window = new ProjectWindow(getApp());
+	window->create();
+	window->loadFile(file);
+	window->raise();
+	window->setFocus();
+	return 1;
 }
 
 
@@ -454,6 +470,7 @@ long ProjectWindow::onUpdClear(FXObject* sender, FXSelector, void*) {
 
 	return 1;
 }
+
 
 FXbool ProjectWindow::close(FXbool notify) {
 	// Perform normal close stuff

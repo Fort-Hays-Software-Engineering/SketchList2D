@@ -73,6 +73,7 @@ protected:
 	FXString             filename;                // File being edited
 	FXbool               filenameset;             // Filename is set
 	FXTime               filetime;                // Time File was saved
+	FXRecentFiles        mrufiles;                // Recent files list
 
 protected:
 	FXString unique() const;
@@ -93,6 +94,7 @@ public:
 	long onCmdOpen(FXObject*, FXSelector, void*);
 	long onCmdSave(FXObject*, FXSelector, void*);
 	long onCmdSaveAs(FXObject*, FXSelector, void*);
+	long onCmdOpenRecent(FXObject*, FXSelector, void* ptr);
 
 	//create a new project
 	long onCmdNewProject(FXObject*, FXSelector, void*);
@@ -118,7 +120,8 @@ public:
 		ID_NEWPLACEABLE,
 		ID_CABINET,
 		ID_VIEWBOM,
-		ID_LAST
+		ID_LAST,
+		ID_OPEN_RECENT
 	};
 
 public:

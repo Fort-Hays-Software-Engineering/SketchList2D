@@ -32,6 +32,8 @@ protected:
 	FXStatusBar         *statusbar;               // Status bar
 	FXDockSite          *topdock;                 // Topmost dock area
 	FXToolBarShell      *dragshell1;              // Shell for floating menubar
+	FXRecentFiles       mrufiles;                // Recent files list
+	FXList              *recentList;           // List of placables the user chooses from
 
 protected:
 
@@ -42,6 +44,9 @@ public:
 	long onCmdNewProject(FXObject*, FXSelector, void*);
 	//Open project
 	long onCmdOpen(FXObject*, FXSelector, void*);
+	//Open Recent Project
+	long onCmdOpenRecent(FXObject*, FXSelector, void* ptr);
+
 	FXApp* getApp() const { return (FXApp*)FXMainWindow::getApp(); }
 
 
@@ -54,7 +59,8 @@ public:
 		ID_NEW,
 		ID_OPEN,
 		ID_NEWPROJECT,
-		ID_LAST
+		ID_LAST,
+		ID_OPEN_RECENT
 	};
 
 public:
@@ -74,5 +80,7 @@ public:
 	FXbool loadFile(const FXString& file);
 
 	virtual ~SplashWindow();
+
 };
+
 #endif // !SPLASHWINDOW_H
