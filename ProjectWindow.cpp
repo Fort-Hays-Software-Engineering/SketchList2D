@@ -7,6 +7,7 @@
 #include <FXDCWindow.h>
 
 
+
 #pragma comment (lib, "ws2_32")
 
 FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
@@ -56,6 +57,8 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	//Frame where data about the currently selected placable type is displayed
 	placeableDataPanel = new FXVerticalFrame(LeftPanel, FRAME_SUNKEN | LAYOUT_FILL_Y | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 10, 10);
 	new FXLabel(placeableDataPanel, "Specifications", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
+	
+	
 
 	widthFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(widthFrame, "Width", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
@@ -79,8 +82,8 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 
 	new FXLabel(LeftPanel, "Grid Size", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
 	gridSizeSlider = new FXSlider(LeftPanel, this, ID_GRIDSIZE, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0);
-	gridSizeSlider->setRange(10, 100);
-	gridSizeSlider->setIncrement(10);
+	gridSizeSlider->setRange(5, 100);
+	gridSizeSlider->setIncrement(5);
 
 	// Status bar
 	statusbar = new FXStatusBar(this, LAYOUT_SIDE_BOTTOM | LAYOUT_FILL_X | STATUSBAR_WITH_DRAGCORNER | FRAME_RAISED);
@@ -294,6 +297,8 @@ long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
 		mdflag = 0;
 		itemClicked = 1;
 	}
+
+
 	return 1;
 }
 
@@ -352,7 +357,7 @@ long ProjectWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 // Change Grid Size With Slider
 long ProjectWindow::onCmdGridSize(FXObject*, FXSelector, void*) {
 	FXint grid = gridSizeSlider->getValue();
-
+	
 	project->set_gridSize(grid);
 	drawScreen();
 

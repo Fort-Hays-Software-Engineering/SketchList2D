@@ -57,6 +57,8 @@ private:
 	FXColor            drawColor;               // Color for the grid lines
 	FXColor			   placeableColor;			// Color for placeables
 
+
+
 	int itemClicked;
 
 	Project* project;

@@ -2,7 +2,7 @@
 #define PLACEABLE_H
 #include "fx.h"
 #include <FXRectangle.h>
-class Placeable {
+class Placeable : public FXObject{
 private:
 	int xPos;
 	int yPos;
@@ -24,6 +24,9 @@ public:
 	int get_height();
 	int get_width();
 
+	FXDataTarget	   heightTarget;			// Data target for height box
+	FXDataTarget	   widthTarget;			    // Data target for width box
+
 	void save(FXStream& stream); // Serialize placeable data for save file
 
 	~Placeable() {};
@@ -31,7 +34,7 @@ public:
 
 class Wall : public Placeable {
 private:
-	bool isInterior;
+	FXbool isInterior;
 
 public:
 	Wall(bool interior);
