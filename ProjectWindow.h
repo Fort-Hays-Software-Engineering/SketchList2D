@@ -57,8 +57,6 @@ private:
 	FXColor            drawColor;               // Color for the grid lines
 	FXColor			   placeableColor;			// Color for placeables
 
-
-
 	int itemClicked;
 
 	Project* project;
@@ -100,6 +98,7 @@ public:
 	long onCmdSave(FXObject*, FXSelector, void*);
 	long onCmdSaveAs(FXObject*, FXSelector, void*);
 	long onCmdOpenRecent(FXObject*, FXSelector, void* ptr);
+	long onCmdPrint(FXObject*, FXSelector, void*);
 
 	//create a new project
 	long onCmdNewProject(FXObject*, FXSelector, void*);
@@ -129,7 +128,8 @@ public:
 		ID_VIEWBOM,
 		ID_LAST,
 		ID_OPEN_RECENT,
-		ID_GRIDSIZE
+		ID_GRIDSIZE,
+		ID_PRINT
 	};
 
 public:
