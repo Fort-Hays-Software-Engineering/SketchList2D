@@ -139,6 +139,7 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	mdflag = 0;
 	dirty = 0;
 	itemClicked = 0;
+	resizeable = 0;
 
 	// Recent files
 	mrufiles.setTarget(this);
@@ -217,6 +218,21 @@ void ProjectWindow::drawScreen()
 		drawControlHandles();
 }
 
+bool ProjectWindow::checkResizeArea(int x, int y) {
+	if (currentSelection == NULL)
+		return false;
+	FXRectangle* focusRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
+		project->placeables[currentIndex]->get_yPos() - 5,
+		project->placeables[currentIndex]->get_width() + 10,
+		project->placeables[currentIndex]->get_height() + 10
+
+	);
+	if (!currentSelection->get_rectangle()->contains(x, y) && focusRect->contains(x, y)) {
+		return true;
+	}
+	return false;
+}
+
 // Mouse button was pressed somewhere
 long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 	canvas->grab();
@@ -231,30 +247,35 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 	FXDCWindow dc(canvas);
 	if (mdflag == 0) {
 
+		if (checkResizeArea(clickX, clickY)) {
+			resizeable = 1;
+		}
+		else {
+			resizeable = 0;
+			//iterate through placeables seeing if this position is inside one of the rectangles
+			for (int i = 0; i < project->get_placeableCount(); i++) {
+				FXRectangle *rect = project->placeables[i]->get_rectangle();
 
-		//iterate through placeables seeing if this position is inside one of the rectangles
-		for (int i = 0; i < project->get_placeableCount(); i++) {
-			FXRectangle *rect = project->placeables[i]->get_rectangle();
 
+				if (rect->contains(clickX, clickY)) {
+					currentSelection = project->placeables[i];
+					currentIndex = i;
+					drawScreen();
+					itemClicked = 1;
+					mdflag = 1;
+					widthText->setText(FXStringVal(project->placeables[i]->get_width()));
+					heightText->setText(FXStringVal(project->placeables[i]->get_height()));
+					return 1;
 
-			if (rect->contains(clickX, clickY)) {
-				currentSelection = project->placeables[i];
-				currentIndex = i;
-				drawScreen();
-				itemClicked = 1;
-				mdflag = 1;
-				widthText->setText(FXStringVal(project->placeables[i]->get_width()));
-				heightText->setText(FXStringVal(project->placeables[i]->get_height()));
-				return 1;
+				}
+				else { // No item clicked, Deselect
+					currentSelection = NULL;
+					drawScreen();
+					widthText->setText("");
+					heightText->setText("");
+				}
 
 			}
-			else { // No item clicked, Deselect
-				currentSelection = NULL;
-				drawScreen();
-				widthText->setText("");
-				heightText->setText("");
-			}
-
 		}
 	}
 	//use data targets to put this placeable's info in onscreen controls
@@ -292,15 +313,63 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 	*/
 	
 	if (currentSelection != NULL) {
+		if (checkResizeArea(ev->win_x, ev->win_y)) {
+			//update cursor to move cursor
+
+		}
 		if (itemClicked == 1 && mdflag == 1) {
 			project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() + ev->win_x - ev->last_x);
 			project->placeables[currentIndex]->set_yPos(project->placeables[currentIndex]->get_yPos() + ev->win_y - ev->last_y);
 			drawScreen();
 		}
+		if (resizeable && mdflag) {
+			//check if in top region
+			FXRectangle* topRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
+				project->placeables[currentIndex]->get_yPos() - 5,
+				project->placeables[currentIndex]->get_width() + 10,
+				10);
+			if (topRect->contains(ev->win_x, ev->win_y)) {
+				currentSelection->set_height(currentSelection->get_height() + ev->last_y - ev->win_y);
+				currentSelection->set_yPos(currentSelection->get_yPos() + ev->win_y - ev->last_y);
+			}
+			//check if in right region
+			FXRectangle* rightRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() + project->placeables[currentIndex]->get_width(),
+				project->placeables[currentIndex]->get_yPos() - 5,
+				project->placeables[currentIndex]->get_width() + 10,
+				project->placeables[currentIndex]->get_height() + 10);
+
+			if (rightRect->contains(ev->win_x, ev->win_y)) {
+				currentSelection->set_width(currentSelection->get_width() + ev->win_x - ev->last_x);
+			}
+			//check if in bottom region
+			FXRectangle* bottomRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
+				project->placeables[currentIndex]->get_yPos() + project->placeables[currentIndex]->get_height(),
+				project->placeables[currentIndex]->get_width() + 10,
+				project->placeables[currentIndex]->get_height() + 10);
+			if (bottomRect->contains(ev->win_x, ev->win_y)) {
+				currentSelection->set_height(currentSelection->get_height() + ev->win_y - ev->last_y);
+			}
+			//check if in left region
+			FXRectangle* leftRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() -5,
+				project->placeables[currentIndex]->get_yPos() - 5,
+				10,
+				project->placeables[currentIndex]->get_height() + 10);
+
+			if (leftRect->contains(ev->win_x, ev->win_y)) {
+				currentSelection->set_width(currentSelection->get_width() + ev->last_x - ev->win_x);
+				currentSelection->set_xPos(currentSelection->get_xPos() + ev->win_x - ev->last_x);
+			}
+			
+			drawScreen();
+			widthText->setText(FXStringVal(project->placeables[currentIndex]->get_width()));
+			heightText->setText(FXStringVal(project->placeables[currentIndex]->get_height()));
+		}
 	}
 	
 	return 1;
 }
+
+
 
 
 
