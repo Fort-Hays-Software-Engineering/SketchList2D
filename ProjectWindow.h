@@ -58,8 +58,11 @@ private:
 	int                isSplashScreen;      // Is this the opening splash screen?
 	FXColor            drawColor;               // Color for the grid lines
 	FXColor			   placeableColor;			// Color for placeables
+<<<<<<< HEAD
 	
 
+=======
+>>>>>>> 576496997680da902d671fdb0f49c918969f1ed0
 
 	int itemClicked;
 
@@ -104,6 +107,7 @@ public:
 	long onCmdSave(FXObject*, FXSelector, void*);
 	long onCmdSaveAs(FXObject*, FXSelector, void*);
 	long onCmdOpenRecent(FXObject*, FXSelector, void* ptr);
+	long onCmdPrint(FXObject*, FXSelector, void*);
 
 	//create a new project
 	long onCmdNewProject(FXObject*, FXSelector, void*);
@@ -135,7 +139,11 @@ public:
 		ID_LAST,
 		ID_OPEN_RECENT,
 		ID_GRIDSIZE,
+<<<<<<< HEAD
 		ID_UPDATESPECS
+=======
+		ID_PRINT
+>>>>>>> 576496997680da902d671fdb0f49c918969f1ed0
 	};
 
 public:
