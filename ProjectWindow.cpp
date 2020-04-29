@@ -26,6 +26,7 @@ FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
 	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPROJECT,		ProjectWindow::onCmdNewProject),
 	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPLACEABLE,	ProjectWindow::onCmdNewPlacable),
 	FXMAPFUNC(SEL_COMMAND,			 ProjectWindow::ID_GRIDSIZE,		ProjectWindow::onCmdGridSize),
+	FXMAPFUNC(SEL_COMMAND,			 ProjectWindow::ID_UPDATESPECS,		ProjectWindow::onCmdUpdateSpecs),
 };
 
 
@@ -36,6 +37,7 @@ FXIMPLEMENT(ProjectWindow, FXMainWindow, ProjectWindowMap, ARRAYNUMBER(ProjectWi
 
 // Construct a ProjectWindow
 ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Designer", NULL, NULL, DECOR_ALL, 0, 0, 800, 600), mrufiles(a) {
+	
 
 	// Add to list of windows
 	//getApp()->windowlist.append(this);
@@ -67,7 +69,7 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	heightFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(heightFrame, "Height", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
 	heightText = new FXTextField(heightFrame, 5, NULL, 0, TEXTFIELD_INTEGER | FRAME_LINE);
-
+	new FXButton(LeftPanel, "&Update", NULL, this, ID_UPDATESPECS, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
 	unitsFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	feetRadio = new FXRadioButton(unitsFrame, "Feet");
 	inchRadio = new FXRadioButton(unitsFrame, "inches");
@@ -79,11 +81,13 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	cabinetFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(cabinetFrame, "Cabinet", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
 	cabinet = new FXText(cabinetFrame);
-
+	
+	gridSizeDisplay = new FXTextField(LeftPanel, 5, NULL, 0, TEXTFIELD_INTEGER | FRAME_LINE);
 	new FXLabel(LeftPanel, "Grid Size", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
 	gridSizeSlider = new FXSlider(LeftPanel, this, ID_GRIDSIZE, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0);
-	gridSizeSlider->setRange(5, 100);
-	gridSizeSlider->setIncrement(5);
+	gridSizeSlider->setRange(1, 6);
+
+
 
 	// Status bar
 	statusbar = new FXStatusBar(this, LAYOUT_SIDE_BOTTOM | LAYOUT_FILL_X | STATUSBAR_WITH_DRAGCORNER | FRAME_RAISED);
@@ -188,10 +192,10 @@ void ProjectWindow::drawScreen()
 	dc.fillRectangle(0, 0, canvasWidth, canvasHeight);
 	dc.setForeground(drawColor);
 
-	for (int x = 0; x < canvasWidth; x = x + project->get_gridSize()) {
+	for (int x = 0; x < canvasWidth; x = x + 16) {
 		dc.drawLine(x, 0, x, canvasHeight);
 	}
-	for (int y = 0; y < canvasHeight; y = y + project->get_gridSize()) {
+	for (int y = 0; y < canvasHeight; y = y + 16) {
 		dc.drawLine(0, y, canvasWidth, y);
 	}
 
@@ -199,7 +203,8 @@ void ProjectWindow::drawScreen()
 
 	//draw placeables
 	for (int i = 0; i < project->get_placeableCount(); i++) {
-		dc.drawRectangles(project->placeables[i]->get_rectangle(), 1);
+		FXRectangle *rect = project->placeables[i]->get_rectangle();
+		dc.drawRectangles(rect, 1);
 	}
 	if(currentSelection != NULL)
 		drawControlHandles();
@@ -224,18 +229,23 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 		for (int i = 0; i < project->get_placeableCount(); i++) {
 			FXRectangle *rect = project->placeables[i]->get_rectangle();
 
+
 			if (rect->contains(clickX, clickY)) {
 				currentSelection = project->placeables[i];
 				currentIndex = i;
 				drawScreen();
 				itemClicked = 1;
 				mdflag = 1;
+				widthText->setText(FXStringVal(project->placeables[i]->get_width()));
+				heightText->setText(FXStringVal(project->placeables[i]->get_height()));
 				return 1;
 
 			}
 			else { // No item clicked, Deselect
 				currentSelection = NULL;
 				drawScreen();
+				widthText->setText("");
+				heightText->setText("");
 			}
 
 		}
@@ -354,11 +364,54 @@ long ProjectWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 	return 1;
 }
 
+//Update Cabinet Specifications
+// Change Grid Size With Slider
+long ProjectWindow::onCmdUpdateSpecs(FXObject*, FXSelector, void*) {
+	
+	currentSelection->set_height(FXIntVal(heightText->getText()));
+	currentSelection->set_width(FXIntVal(widthText->getText()));
+
+	drawScreen();
+
+	return 1;
+}
 // Change Grid Size With Slider
 long ProjectWindow::onCmdGridSize(FXObject*, FXSelector, void*) {
-	FXint grid = gridSizeSlider->getValue();
+	FXint grid, scale = gridSizeSlider->getValue();
+	FXString displayText;
+
 	
+	switch (scale) {
+		case 1:
+			displayText = "1/16\"";
+			grid = 16;
+			break;
+		case 2: 
+			displayText = "1/8\"";
+			grid = 32;
+			break;
+		case 3:
+			displayText = "1/4\"";
+			grid = 64;
+			break;
+		case 4:
+			displayText = "1/2\"";
+			grid = 128;
+			break;
+		case 5:
+			displayText = "1\"";
+			grid = 256;
+			break;
+		case 6:
+			displayText = "2\"";
+			grid = 512;
+			break;
+		default:
+			displayText = "";
+	}
+	gridSizeDisplay->setText(displayText);
 	project->set_gridSize(grid);
+
 	drawScreen();
 
 	return 1;

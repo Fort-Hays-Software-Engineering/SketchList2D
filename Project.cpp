@@ -37,7 +37,7 @@ void Project::save(FXStream& stream)
 
 void Project::load(FXStream& stream)
 {
-	FXint pc, x, y, h, w;
+	FXint x, y, h, w;
 	// Load my stuff from a stream
 	
 	stream >> gridSize;

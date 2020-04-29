@@ -34,6 +34,18 @@ void Placeable::set_yPos(int newY)
 	rectangle->y = newY;
 }
 
+void Placeable::set_width(int newW)
+{
+	width = newW;
+	rectangle->w = newW;
+}
+
+void Placeable::set_height(int newH)
+{
+	height = newH;
+	rectangle->h = newH;
+}
+
 int Placeable::get_xPos()
 {
 	return xPos;

@@ -44,6 +44,8 @@ private:
 	FXTextField       *heightText;
 
 	FXSlider		  *gridSizeSlider;			// Slider selector for adjustable grid Size
+	FXTextField		  *gridSizeDisplay;
+	FXDataTarget	   gridSizeTarget;
 
 	FXVerticalFrame   *createNewProjectFrame;   // Create New Project label and button
 	FXVerticalFrame   *loadProjectFrame;        // Splash screen load new project frame
@@ -56,7 +58,7 @@ private:
 	int                isSplashScreen;      // Is this the opening splash screen?
 	FXColor            drawColor;               // Color for the grid lines
 	FXColor			   placeableColor;			// Color for placeables
-
+	
 
 
 	int itemClicked;
@@ -66,6 +68,8 @@ private:
 	Placeable *currentSelection;
 	int currentIndex;
 	void drawControlHandles();
+	// Scale coordinate to grid Size
+
 
 protected:
 	ProjectWindow() {}
@@ -112,6 +116,7 @@ public:
 	FXApp* getApp() const { return (FXApp*)FXMainWindow::getApp(); }
 
 	long onCmdGridSize(FXObject*, FXSelector, void*);
+	long onCmdUpdateSpecs(FXObject*, FXSelector, void*);
 
 public:
 
@@ -129,7 +134,8 @@ public:
 		ID_VIEWBOM,
 		ID_LAST,
 		ID_OPEN_RECENT,
-		ID_GRIDSIZE
+		ID_GRIDSIZE,
+		ID_UPDATESPECS
 	};
 
 public:
