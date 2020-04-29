@@ -25,11 +25,9 @@ FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
 	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPROJECT,		ProjectWindow::onCmdNewProject),
 	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_NEWPLACEABLE,	ProjectWindow::onCmdNewPlacable),
 	FXMAPFUNC(SEL_COMMAND,			 ProjectWindow::ID_GRIDSIZE,		ProjectWindow::onCmdGridSize),
-<<<<<<< HEAD
 	FXMAPFUNC(SEL_COMMAND,			 ProjectWindow::ID_UPDATESPECS,		ProjectWindow::onCmdUpdateSpecs),
-=======
-	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_PRINT,			ProjectWindow::onCmdPrint),
->>>>>>> 576496997680da902d671fdb0f49c918969f1ed0
+    FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_PRINT,			ProjectWindow::onCmdPrint),
+
 };
 
 
@@ -79,7 +77,7 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 
 	canvas = new FXCanvas(contents, this, ID_CANVAS, FRAME_SUNKEN | FRAME_THICK | LAYOUT_FILL_X | LAYOUT_FILL_Y | LAYOUT_FILL_ROW | LAYOUT_FILL_COLUMN);
 
-<<<<<<< HEAD
+
 	cabinetFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(cabinetFrame, "Cabinet", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
 	cabinet = new FXText(cabinetFrame);
@@ -90,12 +88,12 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	gridSizeSlider->setRange(1, 6);
 
 
-=======
+
 	new FXLabel(LeftPanel, "Grid Size", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
 	gridSizeSlider = new FXSlider(LeftPanel, this, ID_GRIDSIZE, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0);
 	gridSizeSlider->setRange(10, 100);
 	gridSizeSlider->setIncrement(10);
->>>>>>> 576496997680da902d671fdb0f49c918969f1ed0
+
 
 	// Status bar
 	statusbar = new FXStatusBar(this, LAYOUT_SIDE_BOTTOM | LAYOUT_FILL_X | STATUSBAR_WITH_DRAGCORNER | FRAME_RAISED);
@@ -371,7 +369,6 @@ long ProjectWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 	return 1;
 }
 
-<<<<<<< HEAD
 //Update Cabinet Specifications
 // Change Grid Size With Slider
 long ProjectWindow::onCmdUpdateSpecs(FXObject*, FXSelector, void*) {
@@ -388,37 +385,44 @@ long ProjectWindow::onCmdGridSize(FXObject*, FXSelector, void*) {
 	FXint grid, scale = gridSizeSlider->getValue();
 	FXString displayText;
 
-	
 	switch (scale) {
-		case 1:
-			displayText = "1/16\"";
-			grid = 16;
-			break;
-		case 2: 
-			displayText = "1/8\"";
-			grid = 32;
-			break;
-		case 3:
-			displayText = "1/4\"";
-			grid = 64;
-			break;
-		case 4:
-			displayText = "1/2\"";
-			grid = 128;
-			break;
-		case 5:
-			displayText = "1\"";
-			grid = 256;
-			break;
-		case 6:
-			displayText = "2\"";
-			grid = 512;
-			break;
-		default:
-			displayText = "";
+	case 1:
+		displayText = "1/16\"";
+		grid = 16;
+		break;
+	case 2:
+		displayText = "1/8\"";
+		grid = 32;
+		break;
+	case 3:
+		displayText = "1/4\"";
+		grid = 64;
+		break;
+	case 4:
+		displayText = "1/2\"";
+		grid = 128;
+		break;
+	case 5:
+		displayText = "1\"";
+		grid = 256;
+		break;
+	case 6:
+		displayText = "2\"";
+		grid = 512;
+		break;
+	default:
+		displayText = "";
 	}
 	gridSizeDisplay->setText(displayText);
-=======
+
+	project->set_gridSize(grid);
+
+	drawScreen();
+
+	return 1;
+
+}
+
 long ProjectWindow::onCmdPrint(FXObject*, FXSelector, void*) {
 	FXPrintDialog dlg(this, tr("Print File"));
 	FXPrinter printer;
@@ -430,17 +434,7 @@ long ProjectWindow::onCmdPrint(FXObject*, FXSelector, void*) {
 }
 
 
-// Change Grid Size With Slider
-long ProjectWindow::onCmdGridSize(FXObject*, FXSelector, void*) {
-	FXint grid = gridSizeSlider->getValue();
 
->>>>>>> 576496997680da902d671fdb0f49c918969f1ed0
-	project->set_gridSize(grid);
-
-	drawScreen();
-
-	return 1;
-}
 
 // Save
 long ProjectWindow::onCmdSave(FXObject* sender, FXSelector sel, void* ptr) {
