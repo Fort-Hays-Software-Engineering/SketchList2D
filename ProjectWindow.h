@@ -123,6 +123,7 @@ public:
 
 	long onCmdGridSize(FXObject*, FXSelector, void*);
 	long onCmdUpdateSpecs(FXObject*, FXSelector, void*);
+	long deselect();
 
 public:
 

@@ -94,12 +94,6 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 
 
 
-	new FXLabel(LeftPanel, "Grid Size", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
-	gridSizeSlider = new FXSlider(LeftPanel, this, ID_GRIDSIZE, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0);
-	gridSizeSlider->setRange(10, 100);
-	gridSizeSlider->setIncrement(10);
-
-
 	// Status bar
 	statusbar = new FXStatusBar(this, LAYOUT_SIDE_BOTTOM | LAYOUT_FILL_X | STATUSBAR_WITH_DRAGCORNER | FRAME_RAISED);
 
@@ -276,10 +270,7 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 
 				}
 				else { // No item clicked, Deselect
-					currentSelection = NULL;
-					drawScreen();
-					widthText->setText("");
-					heightText->setText("");
+					deselect();
 				}
 
 			}
@@ -324,6 +315,15 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 
 
 
+// The mouse button was released again
+long ProjectWindow::deselect() {
+	currentSelection = NULL;
+	drawScreen();
+	widthText->setText("");
+	heightText->setText("");
+	angleText->setText("");
+	return 1;
+}
 
 // The mouse button was released again
 long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
@@ -342,7 +342,6 @@ long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
 void ProjectWindow::drawControlHandles()
 {
 	FXDCWindow dc(canvas);
-
 	dc.drawFocusRectangle(project->placeables[currentIndex]->get_xPos()-5,
 						  project->placeables[currentIndex]->get_yPos()-5,
 						  project->placeables[currentIndex]->get_width()+10,

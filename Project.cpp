@@ -37,8 +37,8 @@ void Project::save(FXStream& stream)
 
 void Project::load(FXStream& stream)
 {
-	FXint x, y, h, w;
-	// Load my stuff from a stream
+	FXint x, y, h, w, a, v, s6, s7;
+	// Load Project from stream
 	
 	stream >> gridSize;
 	stream >> placeableCount;
@@ -46,9 +46,24 @@ void Project::load(FXStream& stream)
 	// load placeables
 	for (int i = 0; i < placeableCount; i++) {
 		
-		stream >> x >> y >> h >> w;
-		placeables[i] = new Placeable(x, y, h, w);
-		x = y = h = w = NULL;
+		stream >> x >> y >> h >> w >> v >> a >> s6 >> s7;
+		// If version variable is null, the project was saved with an angle
+		if (v == NULL) {
+			placeables[i] = new Placeable(x, y, h, w, a);
+			
+		}
+		else {
+		// If version variable is not null, build cabinets with no angles or extra specs.
+			placeables[i] = new Placeable(x, y, h, w);
+			// previous version means that two cabinets were loaded, if all variables were loaded successfully, add the next cabinet and increment i 
+			if (v && a && s6 && s7) {
+				placeables[++i] = new Placeable(v, a, s6, s7);
+				
+			}
+
+		}
+		x = y = h = w = v = a = s6 = s7 = NULL;
+		
 	}
 }
 

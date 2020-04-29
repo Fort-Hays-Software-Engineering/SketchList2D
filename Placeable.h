@@ -4,16 +4,20 @@
 #include <FXRectangle.h>
 class Placeable : public FXObject{
 private:
-	int xPos;
-	int yPos;
-	int height;
-	int width;
-	int angle;
+	int xPos;						// X position Coordinate 
+	int yPos;						// Y position Coordinate
+	int height;						// Height variable
+	int width;						// Width variable
+	int v;							// Version variable, used to determine save file type
+	int angle;						// Angle variable
+	int s6;							// placeholder variable for another specification
+	int s7;							// placeholder variable for another specification
 	FXRectangle* rectangle;
 
 public:
 	Placeable();
 	Placeable(int x, int y, int h, int w);
+	Placeable(int x, int y, int h, int w, int a);
 	FXRectangle* get_rectangle();
 	void set_xPos(int newX);
 	void set_yPos(int newY);

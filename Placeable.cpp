@@ -19,6 +19,17 @@ Placeable::Placeable(int x, int y, int h, int w)
 	rectangle = new FXRectangle(x, y, w, h);
 }
 
+Placeable::Placeable(int x, int y, int h, int w, int a)
+{
+	xPos = x;
+	yPos = y;
+	height = h;
+	width = w;
+	angle = a;
+	rectangle = new FXRectangle(x, y, w, h);
+}
+
+
 FXRectangle * Placeable::get_rectangle()
 {
 	return rectangle;
@@ -116,5 +127,5 @@ void Placeable::draw(FXDCWindow* dc)
 void Placeable::save(FXStream& stream)
 {
 
-	stream << xPos << yPos << height << width ;        
+	stream << xPos << yPos << height << width << NULL << angle << s6 << s7;        
 }
