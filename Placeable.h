@@ -2,6 +2,7 @@
 #define PLACEABLE_H
 #include "fx.h"
 #include <FXRectangle.h>
+#define PI 3.14159265358979323846
 class Placeable : public FXObject{
 private:
 	int xPos;						// X position Coordinate 
@@ -13,6 +14,9 @@ private:
 	int s6;							// placeholder variable for another specification
 	int s7;							// placeholder variable for another specification
 	FXRectangle* rectangle;
+	FXPoint p[4]; // the points of the rotated rectangle
+
+	void updatePoints();
 
 public:
 	Placeable();
@@ -30,6 +34,7 @@ public:
 	void set_width(int newWidth);
 	int get_height();
 	int get_width();
+	bool isClicked(int clickX, int clickY);
 
 	void draw(FXDCWindow* dc);
 

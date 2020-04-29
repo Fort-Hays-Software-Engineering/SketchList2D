@@ -243,6 +243,7 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 	clickY = ev->click_y;
 
 	int xStart, xEnd, yStart, yEnd;
+	int rotatedX, rotatedY;
 
 	FXDCWindow dc(canvas);
 	if (mdflag == 0) {
@@ -254,10 +255,8 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 			resizeable = 0;
 			//iterate through placeables seeing if this position is inside one of the rectangles
 			for (int i = 0; i < project->get_placeableCount(); i++) {
-				FXRectangle *rect = project->placeables[i]->get_rectangle();
 
-
-				if (rect->contains(clickX, clickY)) {
+				if (project->placeables[i]->isClicked(clickX, clickY)) {
 					currentSelection = project->placeables[i];
 					currentIndex = i;
 					drawScreen();

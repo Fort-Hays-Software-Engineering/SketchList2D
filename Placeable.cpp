@@ -1,5 +1,33 @@
 #include "Placeable.h"
 
+void Placeable::updatePoints()
+{
+	p[0] = FXPoint(xPos, yPos);
+	p[1] = FXPoint(xPos + width, yPos);
+	p[2] = FXPoint(xPos + width, yPos + height);
+	p[3] = FXPoint(xPos, yPos + height);
+
+	//the coordinates for the center of the square
+	FXPoint center = FXPoint(xPos + width * .5, yPos + height * .5);
+
+	int tempX, tempY, rotatedX, rotatedY;
+
+	//rotate each point
+	for (int i = 0; i < 4; i++) {
+		//translate to origin
+		tempX = p[i].x - center.x;
+		tempY = p[i].y - center.y;
+
+		//rotate
+		rotatedX = tempX * cos(angle * PI / 180) - tempY * sin(angle * PI / 180);
+		rotatedY = tempX * sin(angle * PI / 180) + tempY * cos(angle * PI / 180);
+
+		//translate back to original position
+		p[i].x = rotatedX + center.x;
+		p[i].y = rotatedY + center.y;
+	}
+}
+
 Placeable::Placeable()
 {
 	xPos = 0;
@@ -7,6 +35,11 @@ Placeable::Placeable()
 	height = 50;
 	width = 50;
 	angle = 0;
+
+	p[0] = FXPoint(xPos, yPos);
+	p[1] = FXPoint(xPos + width, yPos);
+	p[2] = FXPoint(xPos + width, yPos + height);
+	p[3] = FXPoint(xPos, yPos + height);
 }
 
 Placeable::Placeable(int x, int y, int h, int w)
@@ -17,6 +50,11 @@ Placeable::Placeable(int x, int y, int h, int w)
 	width = w;
 	angle = 0;
 	rectangle = new FXRectangle(x, y, w, h);
+
+	p[0] = FXPoint(xPos, yPos);
+	p[1] = FXPoint(xPos + width, yPos);
+	p[2] = FXPoint(xPos + width, yPos + height);
+	p[3] = FXPoint(xPos, yPos + height);
 }
 
 Placeable::Placeable(int x, int y, int h, int w, int a)
@@ -27,6 +65,7 @@ Placeable::Placeable(int x, int y, int h, int w, int a)
 	width = w;
 	angle = a;
 	rectangle = new FXRectangle(x, y, w, h);
+	updatePoints();
 }
 
 
@@ -39,24 +78,28 @@ void Placeable::set_xPos(int newX)
 {
 	xPos = newX;
 	rectangle->x = newX;
+	updatePoints();
 }
 
 void Placeable::set_yPos(int newY)
 {
 	yPos = newY;
 	rectangle->y = newY;
+	updatePoints();
 }
 
 void Placeable::set_width(int newW)
 {
 	width = newW;
 	rectangle->w = newW;
+	updatePoints();
 }
 
 void Placeable::set_height(int newH)
 {
 	height = newH;
 	rectangle->h = newH;
+	updatePoints();
 }
 
 int Placeable::get_xPos()
@@ -77,6 +120,7 @@ int Placeable::get_angle()
 void Placeable::set_angle(int newAngle)
 {
 	angle = newAngle;
+	updatePoints();
 }
 
 int Placeable::get_height()
@@ -89,33 +133,31 @@ int Placeable::get_width()
 	return width;
 }
 
-void Placeable::draw(FXDCWindow* dc)
+bool Placeable::isClicked(int clickX, int clickY)
 {
-	//the corners of the rectangle
-	FXPoint p[4] = { FXPoint(xPos, yPos),
-					 FXPoint(xPos + width, yPos),
-					 FXPoint(xPos + width, yPos + height),
-					 FXPoint(xPos, yPos + height) };
-
-	//the coordinates for the center of the square
-	FXPoint center = FXPoint(xPos + width * .5, yPos + height * .5);
-	
+	//rotate click to match rectangle
 	int tempX, tempY, rotatedX, rotatedY;
-	
-	//rotate each point
-	for (int i = 0; i < 4; i++) {
+	FXPoint center = FXPoint(xPos + width * .5, yPos + height * .5);
+
 		//translate to origin
-		tempX = p[i].x - center.x;
-		tempY = p[i].y - center.y;
+		tempX = clickX - center.x;
+		tempY = clickY - center.y;
 
 		//rotate
-		rotatedX = tempX*cos(angle * 3.1415 / 180) - tempY*sin(angle * 3.1415 / 180);
-		rotatedY = tempX*sin(angle * 3.1415 / 180) + tempY*cos(angle * 3.1415 / 180);
+		rotatedX = tempX * cos(-angle * PI / 180) - tempY * sin(-angle * PI / 180);
+		rotatedY = tempX * sin(-angle * PI / 180) + tempY * cos(-angle * PI / 180);
 
 		//translate back to original position
-		p[i].x = rotatedX + center.x;
-		p[i].y = rotatedY + center.y;
-	}
+		clickX = rotatedX + center.x;
+		clickY = rotatedY + center.y;
+	if (rectangle->contains(clickX, clickY))
+		return true;
+
+	return false;
+}
+
+void Placeable::draw(FXDCWindow* dc)
+{
 	
 	//draw lines betweeen each point to form a rectangle
 	dc->drawLine(p[0].x, p[0].y, p[1].x, p[1].y);
