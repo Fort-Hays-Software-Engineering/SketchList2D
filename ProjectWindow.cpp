@@ -292,77 +292,22 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 // The mouse has moved, and a placeable is selected, move it
 long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 	FXEvent *ev = (FXEvent*)ptr;
-	/* Experiment in snapping to grid
-	int grid = project->get_gridSize();
-	if (itemClicked == 1 && mdflag == 1 && currentSelection != NULL) {
 
-		if (ev->win_x - ev->last_x > 0){
-			project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() + grid);
-		}
-		else if (ev->win_x - ev->last_x < 0) {
-			project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() - grid);
-		}
-		if (ev->win_y - ev->last_y > 0) {
-			project->placeables[currentIndex]->set_yPos(project->placeables[currentIndex]->get_yPos() + grid);
-		}
-		else if (ev->win_y - ev->last_y < 0) {
-			project->placeables[currentIndex]->set_yPos(project->placeables[currentIndex]->get_yPos() - grid);
-		}
-		drawScreen();
-	}
-	*/
-	
-	if (currentSelection != NULL) {
-		if (checkResizeArea(ev->win_x, ev->win_y)) {
-			//update cursor to move cursor
+	//set the default cursor state is a normal arrow cursor
+	canvas->setDefaultCursor(getApp()->getDefaultCursor(DEF_ARROW_CURSOR));
+	canvas->setDragCursor(getApp()->getDefaultCursor(DEF_ARROW_CURSOR));
 
+	if (currentSelection != NULL) { //if there is a selected placeable
+		if (checkResizeArea(ev->win_x, ev->win_y)) { //if the cursor is in the area to click and drag resize
+			updateCursor(ev->win_x, ev->win_y); //update the cursor to drag arrows
 		}
 		if (itemClicked == 1 && mdflag == 1) {
 			project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() + ev->win_x - ev->last_x);
 			project->placeables[currentIndex]->set_yPos(project->placeables[currentIndex]->get_yPos() + ev->win_y - ev->last_y);
 			drawScreen();
 		}
-		if (resizeable && mdflag) {
-			//check if in top region
-			FXRectangle* topRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
-				project->placeables[currentIndex]->get_yPos() - 5,
-				project->placeables[currentIndex]->get_width() + 10,
-				10);
-			if (topRect->contains(ev->win_x, ev->win_y)) {
-				currentSelection->set_height(currentSelection->get_height() + ev->last_y - ev->win_y);
-				currentSelection->set_yPos(currentSelection->get_yPos() + ev->win_y - ev->last_y);
-			}
-			//check if in right region
-			FXRectangle* rightRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() + project->placeables[currentIndex]->get_width(),
-				project->placeables[currentIndex]->get_yPos() - 5,
-				project->placeables[currentIndex]->get_width() + 10,
-				project->placeables[currentIndex]->get_height() + 10);
-
-			if (rightRect->contains(ev->win_x, ev->win_y)) {
-				currentSelection->set_width(currentSelection->get_width() + ev->win_x - ev->last_x);
-			}
-			//check if in bottom region
-			FXRectangle* bottomRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
-				project->placeables[currentIndex]->get_yPos() + project->placeables[currentIndex]->get_height(),
-				project->placeables[currentIndex]->get_width() + 10,
-				project->placeables[currentIndex]->get_height() + 10);
-			if (bottomRect->contains(ev->win_x, ev->win_y)) {
-				currentSelection->set_height(currentSelection->get_height() + ev->win_y - ev->last_y);
-			}
-			//check if in left region
-			FXRectangle* leftRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() -5,
-				project->placeables[currentIndex]->get_yPos() - 5,
-				10,
-				project->placeables[currentIndex]->get_height() + 10);
-
-			if (leftRect->contains(ev->win_x, ev->win_y)) {
-				currentSelection->set_width(currentSelection->get_width() + ev->last_x - ev->win_x);
-				currentSelection->set_xPos(currentSelection->get_xPos() + ev->win_x - ev->last_x);
-			}
-			
-			drawScreen();
-			widthText->setText(FXStringVal(project->placeables[currentIndex]->get_width()));
-			heightText->setText(FXStringVal(project->placeables[currentIndex]->get_height()));
+		if (resizeable && mdflag) { //if the cursor is in the area to resize, and the mouse is down
+			resize(ev); //resize the current selection
 		}
 	}
 	
@@ -398,6 +343,124 @@ void ProjectWindow::drawControlHandles()
 	
 	
 
+}
+
+void ProjectWindow::updateCursor(int x, int y) {
+	//rectangles to check which region the cursor is in
+	FXRectangle* topRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
+		project->placeables[currentIndex]->get_yPos() - 5,
+		project->placeables[currentIndex]->get_width() + 10,
+		10);
+	FXRectangle* rightRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() + project->placeables[currentIndex]->get_width(),
+		project->placeables[currentIndex]->get_yPos() - 5,
+		project->placeables[currentIndex]->get_width() + 10,
+		project->placeables[currentIndex]->get_height() + 10);
+	FXRectangle* bottomRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
+		project->placeables[currentIndex]->get_yPos() + project->placeables[currentIndex]->get_height(),
+		project->placeables[currentIndex]->get_width() + 10,
+		project->placeables[currentIndex]->get_height() + 10);
+	FXRectangle* leftRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
+		project->placeables[currentIndex]->get_yPos() - 5,
+		10,
+		project->placeables[currentIndex]->get_height() + 10);
+
+	if (topRect->contains(x, y)) { //if in top region
+		if (rightRect->contains(x, y)) { //and right region
+			// top-right arrow
+			canvas->setDefaultCursor(getApp()->getDefaultCursor(DEF_DRAGTR_CURSOR));
+			canvas->setDragCursor(getApp()->getDefaultCursor(DEF_DRAGTR_CURSOR));
+		}
+		else if (leftRect->contains(x, y)) { //and left region
+			// top-left arrow
+			canvas->setDefaultCursor(getApp()->getDefaultCursor(DEF_DRAGTL_CURSOR));
+			canvas->setDragCursor(getApp()->getDefaultCursor(DEF_DRAGTL_CURSOR));
+		}
+		else { //just the top
+			// up and down arrow
+			canvas->setDefaultCursor(getApp()->getDefaultCursor(DEF_DRAGH_CURSOR));
+			canvas->setDragCursor(getApp()->getDefaultCursor(DEF_DRAGH_CURSOR));
+		}
+	}
+	else if (bottomRect->contains(x, y)) { //if in bottom region
+		if (rightRect->contains(x, y)) { //and right region
+			// bottom right arrow
+			canvas->setDefaultCursor(getApp()->getDefaultCursor(DEF_DRAGBR_CURSOR));
+			canvas->setDragCursor(getApp()->getDefaultCursor(DEF_DRAGBR_CURSOR));
+		}
+		else if (leftRect->contains(x, y)) { //and left region
+			//bottom left arrow
+			canvas->setDefaultCursor(getApp()->getDefaultCursor(DEF_DRAGBL_CURSOR));
+			canvas->setDragCursor(getApp()->getDefaultCursor(DEF_DRAGBL_CURSOR));
+		}
+		else { //just the bottom
+			// up and down arrow
+			canvas->setDefaultCursor(getApp()->getDefaultCursor(DEF_DRAGH_CURSOR));
+			canvas->setDragCursor(getApp()->getDefaultCursor(DEF_DRAGH_CURSOR));
+		}
+
+	}
+	else if (rightRect->contains(x, y)) { //just the right region
+		// left and right arrow
+		canvas->setDefaultCursor(getApp()->getDefaultCursor(DEF_DRAGV_CURSOR));
+		canvas->setDragCursor(getApp()->getDefaultCursor(DEF_DRAGV_CURSOR));
+	}
+	else if (leftRect->contains(x, y)) { // just the left region
+		// left and right arrow
+		canvas->setDefaultCursor(getApp()->getDefaultCursor(DEF_DRAGV_CURSOR));
+		canvas->setDragCursor(getApp()->getDefaultCursor(DEF_DRAGV_CURSOR));
+	}
+	delete rightRect;
+	delete leftRect;
+	delete topRect;
+	delete bottomRect;
+}
+
+void ProjectWindow::resize(FXEvent *ev) {
+	//rectangles to check which region the cursor is in
+	FXRectangle* topRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
+		project->placeables[currentIndex]->get_yPos() - 5,
+		project->placeables[currentIndex]->get_width() + 10,
+		10);
+	FXRectangle* rightRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() + project->placeables[currentIndex]->get_width(),
+		project->placeables[currentIndex]->get_yPos() - 5,
+		project->placeables[currentIndex]->get_width() + 10,
+		project->placeables[currentIndex]->get_height() + 10);
+	FXRectangle* bottomRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
+		project->placeables[currentIndex]->get_yPos() + project->placeables[currentIndex]->get_height(),
+		project->placeables[currentIndex]->get_width() + 10,
+		project->placeables[currentIndex]->get_height() + 10);
+	FXRectangle* leftRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
+		project->placeables[currentIndex]->get_yPos() - 5,
+		10,
+		project->placeables[currentIndex]->get_height() + 10);
+
+	//if in the top region
+	if (topRect->contains(ev->win_x, ev->win_y)) {
+		currentSelection->set_height(currentSelection->get_height() + ev->last_y - ev->win_y); //adjust height based on mouse movement
+		currentSelection->set_yPos(currentSelection->get_yPos() + ev->win_y - ev->last_y); //since this is the top, we have to adjust the y position
+	}
+	//check if in right region
+	if (rightRect->contains(ev->win_x, ev->win_y)) {
+		currentSelection->set_width(currentSelection->get_width() + ev->win_x - ev->last_x); //adjust the width
+	}
+	//check if in bottom region
+	if (bottomRect->contains(ev->win_x, ev->win_y)) {
+		currentSelection->set_height(currentSelection->get_height() + ev->win_y - ev->last_y); //adjust the height
+	}
+	//check if in left region
+	if (leftRect->contains(ev->win_x, ev->win_y)) {
+		currentSelection->set_width(currentSelection->get_width() + ev->last_x - ev->win_x); //adjust the width
+		currentSelection->set_xPos(currentSelection->get_xPos() + ev->win_x - ev->last_x); //since this is the left, we have to adjust the x position
+	}
+
+	drawScreen(); //update the canvas
+	widthText->setText(FXStringVal(project->placeables[currentIndex]->get_width())); //update the width in the text box
+	heightText->setText(FXStringVal(project->placeables[currentIndex]->get_height())); //update the height in the text box
+
+	delete rightRect;
+	delete leftRect;
+	delete topRect;
+	delete bottomRect;
 }
 
 // Paint the canvas

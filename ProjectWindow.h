@@ -59,8 +59,6 @@ private:
 	FXColor            drawColor;               // Color for the grid lines
 	FXColor			   placeableColor;			// Color for placeables
 
-	FXCursor           *cursor;
-
 
 	int itemClicked;
 	int resizeable; //whether mouse movement should resize the current object
@@ -71,6 +69,8 @@ private:
 	int currentIndex;
 	void drawControlHandles();
 	bool checkResizeArea(int x, int y);
+	void updateCursor(int x, int y);
+	void resize(FXEvent* ev);
 	// Scale coordinate to grid Size
 
 
