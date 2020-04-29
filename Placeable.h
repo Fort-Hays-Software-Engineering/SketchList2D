@@ -8,6 +8,7 @@ private:
 	int yPos;
 	int height;
 	int width;
+	int angle;
 	FXRectangle* rectangle;
 
 public:
@@ -18,11 +19,15 @@ public:
 	void set_yPos(int newY);
 	int get_xPos();
 	int get_yPos();
+	int get_angle();
+	void set_angle(int newAngle);
 
 	void set_height(int newHeight);
 	void set_width(int newWidth);
 	int get_height();
 	int get_width();
+
+	void draw(FXDCWindow* dc);
 
 	FXDataTarget	   heightTarget;			// Data target for height box
 	FXDataTarget	   widthTarget;			    // Data target for width box

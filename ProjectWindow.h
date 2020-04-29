@@ -31,7 +31,7 @@ private:
 	FXVerticalFrame   *placeableDataPanel;      // The panel where data about the currently selected placeable is displayed
 
 	FXHorizontalFrame *widthFrame;              // Width frame of the data panel
-	FXTextField            *widthText;
+	FXTextField       *widthText;
 
 	FXHorizontalFrame *cabinetFrame;
 	FXText          *cabinet;                 //cabinet test
@@ -58,6 +58,8 @@ private:
 	int                isSplashScreen;      // Is this the opening splash screen?
 	FXColor            drawColor;               // Color for the grid lines
 	FXColor			   placeableColor;			// Color for placeables
+	FXHorizontalFrame *angleFrame;              //frame to hold the angle data text box and label
+	FXTextField		  *angleText;               //the angle of the placeable
 
 
 	int itemClicked;

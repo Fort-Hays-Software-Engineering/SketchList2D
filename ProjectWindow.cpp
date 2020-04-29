@@ -68,6 +68,11 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	heightFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(heightFrame, "Height", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
 	heightText = new FXTextField(heightFrame, 5, NULL, 0, TEXTFIELD_INTEGER | FRAME_LINE);
+
+	angleFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
+	new FXLabel(angleFrame, "Angle", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
+	angleText = new FXTextField(angleFrame, 5, NULL, 0, TEXTFIELD_INTEGER | FRAME_LINE);
+
 	new FXButton(LeftPanel, "&Update", NULL, this, ID_UPDATESPECS, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
 	unitsFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	feetRadio = new FXRadioButton(unitsFrame, "Feet");
@@ -211,11 +216,12 @@ void ProjectWindow::drawScreen()
 
 	//draw placeables
 	for (int i = 0; i < project->get_placeableCount(); i++) {
-		FXRectangle *rect = project->placeables[i]->get_rectangle();
-		dc.drawRectangles(rect, 1);
+		project->placeables[i]->draw(&dc);
 	}
 	if(currentSelection != NULL)
 		drawControlHandles();
+
+
 }
 
 bool ProjectWindow::checkResizeArea(int x, int y) {
@@ -265,6 +271,7 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 					mdflag = 1;
 					widthText->setText(FXStringVal(project->placeables[i]->get_width()));
 					heightText->setText(FXStringVal(project->placeables[i]->get_height()));
+					angleText->setText(FXStringVal(project->placeables[i]->get_angle()));
 					return 1;
 
 				}
@@ -507,6 +514,7 @@ long ProjectWindow::onCmdUpdateSpecs(FXObject*, FXSelector, void*) {
 	
 	currentSelection->set_height(FXIntVal(heightText->getText()));
 	currentSelection->set_width(FXIntVal(widthText->getText()));
+	currentSelection->set_angle(FXIntVal(angleText->getText()));
 
 	drawScreen();
 
