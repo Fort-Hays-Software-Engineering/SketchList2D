@@ -341,10 +341,7 @@ long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
 void ProjectWindow::drawControlHandles()
 {
 	FXDCWindow dc(canvas);
-	dc.drawFocusRectangle(project->placeables[currentIndex]->get_xPos()-5,
-						  project->placeables[currentIndex]->get_yPos()-5,
-						  project->placeables[currentIndex]->get_width()+10,
-						  project->placeables[currentIndex]->get_height()+10);
+	currentSelection->drawControlHandles(&dc);
 	
 	
 

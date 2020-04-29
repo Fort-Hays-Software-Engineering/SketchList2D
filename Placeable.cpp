@@ -166,6 +166,41 @@ void Placeable::draw(FXDCWindow* dc)
 	dc->drawLine(p[3].x, p[3].y, p[0].x, p[0].y);
 }
 
+void Placeable::drawControlHandles(FXDCWindow * dc)
+{
+
+	//get points for selection rectangle
+	FXPoint select[4];
+	select[0] = FXPoint(xPos-5, yPos-5);
+	select[1] = FXPoint(xPos + width + 5, yPos-5);
+	select[2] = FXPoint(xPos + width + 5, yPos + height + 5);
+	select[3] = FXPoint(xPos -5, yPos + height + 5);
+
+	//rotate points
+	int tempX, tempY, rotatedX, rotatedY;
+	FXPoint center = FXPoint(xPos + width * .5, yPos + height * .5);
+	//rotate each point
+	for (int i = 0; i < 4; i++) {
+		//translate to origin
+		tempX = select[i].x - center.x;
+		tempY = select[i].y - center.y;
+
+		//rotate
+		rotatedX = tempX * cos(angle * PI / 180) - tempY * sin(angle * PI / 180);
+		rotatedY = tempX * sin(angle * PI / 180) + tempY * cos(angle * PI / 180);
+
+		//translate back to original position
+		select[i].x = rotatedX + center.x;
+		select[i].y = rotatedY + center.y;
+	}
+	//draw lines
+	dc->setForeground(FXRGB(209, 209, 209));
+	dc->drawLine(select[0].x, select[0].y, select[1].x, select[1].y);
+	dc->drawLine(select[1].x, select[1].y, select[2].x, select[2].y);
+	dc->drawLine(select[2].x, select[2].y, select[3].x, select[3].y);
+	dc->drawLine(select[3].x, select[3].y, select[0].x, select[0].y);
+}
+
 void Placeable::save(FXStream& stream)
 {
 

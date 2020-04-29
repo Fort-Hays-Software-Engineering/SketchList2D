@@ -13,8 +13,8 @@ private:
 	int angle;						// Angle variable
 	int s6;							// placeholder variable for another specification
 	int s7;							// placeholder variable for another specification
-	FXRectangle* rectangle;
-	FXPoint p[4]; // the points of the rotated rectangle
+	FXRectangle* rectangle;         // The unrotated rectangle for the placeale
+	FXPoint p[4];                   // the points of the rotated rectangle
 
 	void updatePoints();
 
@@ -37,6 +37,7 @@ public:
 	bool isClicked(int clickX, int clickY);
 
 	void draw(FXDCWindow* dc);
+	void drawControlHandles(FXDCWindow* dc);
 
 	FXDataTarget	   heightTarget;			// Data target for height box
 	FXDataTarget	   widthTarget;			    // Data target for width box
