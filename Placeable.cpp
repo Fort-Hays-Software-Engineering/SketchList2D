@@ -206,3 +206,13 @@ void Placeable::save(FXStream& stream)
 
 	stream << xPos << yPos << height << width << NULL << angle << s6 << s7;        
 }
+
+Wall::Wall(bool interior) {
+	if (isInterior == true)
+		return;
+}
+
+bool Wall::get_isInterior() {
+	return isInterior;
+}
+
