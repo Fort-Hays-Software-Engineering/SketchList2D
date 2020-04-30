@@ -295,8 +295,24 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 	canvas->setDragCursor(getApp()->getDefaultCursor(DEF_ARROW_CURSOR));
 
 	if (currentSelection != NULL) { //if there is a selected placeable
-		if (checkResizeArea(ev->win_x, ev->win_y)) { //if the cursor is in the area to click and drag resize
-			updateCursor(ev->win_x, ev->win_y); //update the cursor to drag arrows
+		//rotate cursor against current selection
+		int tempX, tempY, rotatedX, rotatedY;
+		FXPoint center = FXPoint(currentSelection->get_xPos() + currentSelection->get_width() * .5,
+			                     currentSelection->get_yPos() + currentSelection->get_height() * .5);
+
+		//translate to origin
+		tempX = ev->win_x - center.x;
+		tempY = ev->win_y - center.y;
+
+		//rotate
+		rotatedX = tempX * cos(-currentSelection->get_angle() * PI / 180) - tempY * sin(-currentSelection->get_angle() * PI / 180);
+		rotatedY = tempX * sin(-currentSelection->get_angle() * PI / 180) + tempY * cos(-currentSelection->get_angle() * PI / 180);
+
+		//translate back to original position
+		rotatedX += center.x;
+		rotatedY += center.y;
+		if (checkResizeArea(rotatedX, rotatedY)) { //if the cursor is in the area to click and drag resize
+			updateCursor(rotatedX, rotatedY); //update the cursor to drag arrows
 		}
 		if (itemClicked == 1 && mdflag == 1) {
 			project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() + ev->win_x - ev->last_x);
@@ -304,7 +320,20 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 			drawScreen();
 		}
 		if (resizeable && mdflag) { //if the cursor is in the area to resize, and the mouse is down
-			resize(ev); //resize the current selection
+			int lastX, lastY;
+			lastX = ev->last_x;
+			lastY = ev->last_y;
+			tempX = lastX - center.x;
+			tempY = lastY - center.y;
+
+			//rotate
+			lastX = tempX * cos(-currentSelection->get_angle() * PI / 180) - tempY * sin(-currentSelection->get_angle() * PI / 180);
+			lastY = tempX * sin(-currentSelection->get_angle() * PI / 180) + tempY * cos(-currentSelection->get_angle() * PI / 180);
+
+			//translate back to original position
+			lastX += center.x;
+			lastY += center.y;
+			resize(lastX, rotatedX, lastY, rotatedY); //resize the current selection
 		}
 	}
 	
@@ -417,7 +446,8 @@ void ProjectWindow::updateCursor(int x, int y) {
 	delete bottomRect;
 }
 
-void ProjectWindow::resize(FXEvent *ev) {
+
+void ProjectWindow::resize(int lastX, int curX, int lastY, int curY) {
 	//rectangles to check which region the cursor is in
 	FXRectangle* topRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
 		project->placeables[currentIndex]->get_yPos() - 5,
@@ -437,22 +467,22 @@ void ProjectWindow::resize(FXEvent *ev) {
 		project->placeables[currentIndex]->get_height() + 10);
 
 	//if in the top region
-	if (topRect->contains(ev->win_x, ev->win_y)) {
-		currentSelection->set_height(currentSelection->get_height() + ev->last_y - ev->win_y); //adjust height based on mouse movement
-		currentSelection->set_yPos(currentSelection->get_yPos() + ev->win_y - ev->last_y); //since this is the top, we have to adjust the y position
+	if (topRect->contains(curX, curY)) {
+		currentSelection->set_height(currentSelection->get_height() + lastY - curY); //adjust height based on mouse movement
+		currentSelection->set_yPos(currentSelection->get_yPos() + curY - lastY); //since this is the top, we have to adjust the y position
 	}
 	//check if in right region
-	if (rightRect->contains(ev->win_x, ev->win_y)) {
-		currentSelection->set_width(currentSelection->get_width() + ev->win_x - ev->last_x); //adjust the width
+	if (rightRect->contains(curX, curY)) {
+		currentSelection->set_width(currentSelection->get_width() + curX - lastX); //adjust the width
 	}
 	//check if in bottom region
-	if (bottomRect->contains(ev->win_x, ev->win_y)) {
-		currentSelection->set_height(currentSelection->get_height() + ev->win_y - ev->last_y); //adjust the height
+	if (bottomRect->contains(curX, curY)) {
+		currentSelection->set_height(currentSelection->get_height() + curY - lastY); //adjust the height
 	}
 	//check if in left region
-	if (leftRect->contains(ev->win_x, ev->win_y)) {
-		currentSelection->set_width(currentSelection->get_width() + ev->last_x - ev->win_x); //adjust the width
-		currentSelection->set_xPos(currentSelection->get_xPos() + ev->win_x - ev->last_x); //since this is the left, we have to adjust the x position
+	if (leftRect->contains(curX, curY)) {
+		currentSelection->set_width(currentSelection->get_width() + lastX - curX); //adjust the width
+		currentSelection->set_xPos(currentSelection->get_xPos() + curX - lastX); //since this is the left, we have to adjust the x position
 	}
 
 	drawScreen(); //update the canvas

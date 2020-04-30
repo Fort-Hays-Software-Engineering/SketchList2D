@@ -72,7 +72,7 @@ private:
 	void drawControlHandles();
 	bool checkResizeArea(int x, int y);
 	void updateCursor(int x, int y);
-	void resize(FXEvent* ev);
+	void resize(int lastX, int curX, int lastY, int curY);
 	// Scale coordinate to grid Size
 
 
