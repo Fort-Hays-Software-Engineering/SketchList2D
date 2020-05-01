@@ -177,6 +177,8 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	dirty = 0;
 	itemClicked = 0;
 	resizeable = 0;
+	xDrag = 0;
+	yDrag = 0;
 
 	// Recent files
 	mrufiles.setTarget(this);
@@ -397,8 +399,26 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 			updateCursor(rotatedPoint.x, rotatedPoint.y); //update the cursor to drag arrows
 		}
 		if (itemClicked == 1 && mdflag == 1) {
-			project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() + (ev->win_x - ev->last_x)*project->get_gridSize()/10);
-			project->placeables[currentIndex]->set_yPos(project->placeables[currentIndex]->get_yPos() + (ev->win_y - ev->last_y)*project->get_gridSize()/10);
+			xDrag += ev->win_x - ev->last_x;
+			yDrag += ev->win_y - ev->last_y;
+			if (xDrag > 10) {
+				project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() + project->get_gridSize());
+				xDrag = 0;
+			}
+			else if (xDrag < -10) {
+				project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() - project->get_gridSize());
+				xDrag = 0;
+			}
+			if (yDrag > 10) {
+				project->placeables[currentIndex]->set_yPos(project->placeables[currentIndex]->get_yPos() + project->get_gridSize());
+				yDrag = 0;
+			}
+			else if (yDrag < -10) {
+				project->placeables[currentIndex]->set_yPos(project->placeables[currentIndex]->get_yPos() - project->get_gridSize());
+				yDrag = 0;
+			}
+			
+			
 			drawScreen();
 		}
 		if (resizeable && mdflag) { //if the cursor is in the area to resize, and the mouse is down
@@ -435,6 +455,8 @@ long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
 	if (mdflag) {
 
 		// Mouse no longer down
+		xDrag = 0;
+		yDrag = 0;
 		resizeable = 0;
 		mdflag = 0;
 		itemClicked = 1;

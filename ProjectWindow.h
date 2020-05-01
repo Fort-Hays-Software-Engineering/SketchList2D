@@ -67,6 +67,8 @@ private:
 
 	int itemClicked;
 	int resizeable; //whether mouse movement should resize the current object
+	int xDrag; //how far the mouse has been dragged this click
+	int yDrag; //how far the mouse has been dragged this click
 
 	Project* project;
 
