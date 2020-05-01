@@ -18,15 +18,25 @@ private:
 	FXint scale(FXint x);           // scales the coordinates
 	FXint curgrid;					// current grid for scaling
 	void updatePoints();
+	FXString name;					// Holds the name for the cabinet
+	FXbool isPrefab;				// Pre-Fab
+	FXint prefabType;				// prefab type
+	FXbool isDoor;                  // if prefab is door.  for code enforcement
+	
 
 public:
 	Placeable();
 	Placeable(int x, int y, int h, int w);
+	Placeable(bool isPrefab, int type, int x, int y);
 	Placeable(int x, int y, int h, int w, int a);
 	Placeable(int x, int y, int h, int w, int a, int grid);
 	FXRectangle* get_rectangle();
 	void set_xPos(int newX);
 	void set_yPos(int newY);
+	void set_name(FXString newName);
+	FXString get_name();
+	bool get_prefab();
+
 	int get_xPos();
 	int get_yPos();
 	int get_angle();
@@ -40,6 +50,7 @@ public:
 	bool isClicked(int clickX, int clickY);
 
 	void draw(FXDCWindow* dc, int grid);
+	void drawPrefab(FXDCWindow* dc, int grid);              // draw extra prefab features
 	void drawControlHandles(FXDCWindow* dc);
 
 	FXDataTarget	   heightTarget;			// Data target for height box

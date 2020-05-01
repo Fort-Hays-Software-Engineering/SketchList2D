@@ -19,6 +19,7 @@ public:
 	void load(FXStream& stream); // deserialize project data from save file
 	void save(FXStream& stream); // Serialize project data for save file
 	void addPlaceable(int x, int y, int h, int w);
+	void addPlaceable(bool, int type, int x, int y);
 	int get_placeableCount();
 	
 

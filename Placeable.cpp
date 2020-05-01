@@ -36,12 +36,15 @@ Placeable::Placeable()
 	width = 50;
 	angle = 0;
 	curgrid = 1;
+	name = "";
+	isPrefab = false;
 
 	p[0] = FXPoint(xPos, yPos);
 	p[1] = FXPoint(xPos + width, yPos);
 	p[2] = FXPoint(xPos + width, yPos + height);
 	p[3] = FXPoint(xPos, yPos + height);
 }
+
 
 Placeable::Placeable(int x, int y, int h, int w)
 {
@@ -52,6 +55,8 @@ Placeable::Placeable(int x, int y, int h, int w)
 	angle = 0;
 	rectangle = new FXRectangle(x, y, scale(w), scale(h));
 	curgrid = 1;
+	name = "";
+	isPrefab = false;
 
 	p[0] = FXPoint(xPos, yPos);
 	p[1] = FXPoint(xPos + width, yPos);
@@ -69,6 +74,8 @@ Placeable::Placeable(int x, int y, int h, int w, int a)
 	rectangle = new FXRectangle(x, y, scale(w), scale(h));
 	updatePoints();
 	curgrid = 1;
+	name = "";
+	isPrefab = false;
 }
 
 Placeable::Placeable(int x, int y, int h, int w, int a, int grid) {
@@ -78,6 +85,7 @@ Placeable::Placeable(int x, int y, int h, int w, int a, int grid) {
 	width = w;
 	angle = a;
 	curgrid = grid;
+	isPrefab = false;
 	rectangle = new FXRectangle(scale(x), scale(y), scale(w), scale(h));
 
 
@@ -87,6 +95,62 @@ Placeable::Placeable(int x, int y, int h, int w, int a, int grid) {
 	p[3] = FXPoint(xPos, yPos + height);
 }
 
+//Prefab Constructor
+Placeable::Placeable(bool prefab, int type, int x, int y) {
+	xPos = x;
+	yPos = y;
+	isPrefab = true;
+	curgrid = x;
+	prefabType = type;
+	// Prefab Types
+	switch (type) {
+	case 0:
+		name = "Left-Swing Door";
+		isDoor = true;
+		width = 512;
+		height = 256;
+		break;
+	case 1:
+		name = "Right-Swing Door";
+		isDoor = true;
+		width = 512;
+		height = 256;
+		break;
+	case 2:
+		name = "Sink Cabinet";
+		isDoor = false;
+		width = 960;
+		height = 384;
+		break;
+	case 3:
+		name = "Stove";
+		isDoor = false;
+		width = 480;
+		height = 448;
+		break;
+	case 4:
+		name = "Corner Cabinet";
+		isDoor = false;
+		width = 512;
+		height = 512;
+		break;
+	default:
+		break;
+
+	}
+
+	angle = 0;
+	rectangle = new FXRectangle(x, y, scale(width), scale(height));
+	curgrid = 1;
+
+
+	p[0] = FXPoint(xPos, yPos);
+	p[1] = FXPoint(xPos + width, yPos);
+	p[2] = FXPoint(xPos + width, yPos + height);
+	p[3] = FXPoint(xPos, yPos + height);
+
+
+}
 
 FXRectangle * Placeable::get_rectangle()
 {
@@ -136,6 +200,20 @@ int Placeable::get_angle()
 	return angle;
 }
 
+FXString Placeable::get_name()
+{
+	return name;
+}
+
+void Placeable::set_name(FXString newName)
+{
+	name = newName;
+}
+
+bool Placeable::get_prefab()
+{
+	return isPrefab;
+}
 void Placeable::set_angle(int newAngle)
 {
 	angle = newAngle;
@@ -201,8 +279,11 @@ void Placeable::draw(FXDCWindow* dc, int grid)
 	dc->drawLine(scale(p[2].x), scale(p[2].y), scale(p[3].x), scale(p[3].y));
 	dc->drawLine(scale(p[3].x), scale(p[3].y), scale(p[0].x), scale(p[0].y));
 
+
 	dc->setForeground(FXRGB(0, 209, 209));
 	dc->drawRectangle(rectangle->x, rectangle->y, rectangle->w, rectangle->h);
+
+
 }
 
 void Placeable::drawControlHandles(FXDCWindow * dc)
@@ -244,6 +325,85 @@ void Placeable::save(FXStream& stream)
 {
 
 	stream << xPos << yPos << height << width << NULL << angle << s6 << s7;        
+}
+
+void Placeable::drawPrefab(FXDCWindow* dc, int grid) {
+	
+	// Set divisor to determine how much each 10px x 10x grid square represents
+	curgrid = grid;
+	int c[4], cw, ch;
+
+
+
+	
+	// Prefab Types
+	switch (prefabType) {
+	case 0: // left-swing door
+		//draw lines betweeen each point to form a rectangle
+		dc->drawLine(scale(p[0].x), scale(p[0].y), scale(p[1].x), scale(p[1].y));
+		dc->setForeground(FXRGB(209, 0, 0));
+		dc->drawLine(scale(p[3].x), scale(p[3].y), scale(p[1].x), scale(p[1].y));
+		dc->setForeground(FXRGB(0, 0, 0));
+		break;
+	case 1: // right-swing door
+		//draw lines betweeen each point to form a rectangle
+		dc->drawLine(scale(p[0].x), scale(p[0].y), scale(p[1].x), scale(p[1].y));
+		dc->setForeground(FXRGB(209, 0, 0));
+		dc->drawLine(scale(p[2].x), scale(p[2].y), scale(p[0].x), scale(p[0].y));
+		dc->setForeground(FXRGB(0, 0, 0));
+		break;
+	case 2: // sink cabinet
+		int sx, sy, sw, sh;
+		sw = scale(width) *.5;
+		sh = scale(height) *.75;
+		sx = scale(xPos) + (scale(width) * .25);
+		sy = scale(yPos) + (scale(height) * .125);
+
+		//draw lines betweeen each point to form a rectangle
+		dc->drawLine(scale(p[0].x), scale(p[0].y), scale(p[1].x), scale(p[1].y));
+		dc->drawLine(scale(p[1].x), scale(p[1].y), scale(p[2].x), scale(p[2].y));
+		dc->drawLine(scale(p[2].x), scale(p[2].y), scale(p[3].x), scale(p[3].y));
+		dc->drawLine(scale(p[3].x), scale(p[3].y), scale(p[0].x), scale(p[0].y));
+		dc->drawRoundRectangle(sx, sy, sw, sh, sw*.25, sh*.25);
+		break;
+	case 3: // stove
+		
+		cw = scale(width) * .25;
+		ch = scale(height) * .25;
+		c[0] = scale(xPos) + (scale(width) * .13);
+		c[1] = scale(yPos) + (scale(height) * .25);
+		c[2] = scale(xPos) + (scale(width) * .6);
+		c[3] = scale(yPos) + (scale(height) * .6);
+
+		//draw lines betweeen each point to form a rectangle
+		dc->drawLine(scale(p[0].x), scale(p[0].y), scale(p[1].x), scale(p[1].y));
+		dc->drawLine(scale(p[1].x), scale(p[1].y), scale(p[2].x), scale(p[2].y));
+		dc->drawLine(scale(p[2].x), scale(p[2].y), scale(p[3].x), scale(p[3].y));
+		dc->drawLine(scale(p[3].x), scale(p[3].y), scale(p[0].x), scale(p[0].y));
+		dc->drawEllipse(c[0], c[1], cw, ch);
+		dc->drawEllipse(c[2], c[1], cw, ch);
+		dc->drawEllipse(c[0], c[3], cw, ch);
+		dc->drawEllipse(c[2], c[3], cw, ch);
+		break;
+	case 4: // corner cabinet
+		cw = scale(width) * .25;
+		ch = scale(height) * .25;
+		c[0] = scale(xPos) + (scale(width) * .333);
+		c[1] = scale(yPos) + (scale(height) * .667);
+
+
+		//draw lines betweeen each point to form a rectangle
+		dc->drawLine(scale(p[0].x), scale(p[0].y), scale(p[1].x), scale(p[1].y));
+		dc->drawLine(scale(p[1].x), scale(p[1].y), scale(p[2].x), scale(p[2].y));
+		dc->drawLine(scale(p[2].x), scale(p[2].y), c[0], scale(p[2].y));
+		dc->drawLine(scale(p[0].x), scale(p[0].y), scale(p[0].x), c[1]);
+		dc->drawLine(scale(p[0].x), c[1], c[0], scale(p[3].y));
+
+		break;
+	default:
+		break;
+
+	}
 }
 
 Wall::Wall(bool interior) {

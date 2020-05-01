@@ -76,6 +76,12 @@ void Project::addPlaceable(int x, int y, int h, int w)
 	placeableCount++;
 }
 
+void Project::addPlaceable(bool, int type, int x, int y)
+{
+	placeables[placeableCount] = new Placeable(true, type, x, y);
+	placeableCount++;
+}
+
 int Project::get_placeableCount()
 {
 	return placeableCount;
