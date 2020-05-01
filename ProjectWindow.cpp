@@ -306,10 +306,11 @@ void ProjectWindow::drawScreen()
 bool ProjectWindow::checkResizeArea(int x, int y) {
 	if (currentSelection == NULL)
 		return false;
-	FXRectangle* focusRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
-		project->placeables[currentIndex]->get_yPos() - 5,
-		project->placeables[currentIndex]->get_width() + 10,
-		project->placeables[currentIndex]->get_height() + 10
+	FXRectangle* currentRect = currentSelection->get_rectangle();
+	FXRectangle* focusRect = new FXRectangle(currentRect->x - 5,
+		currentRect->y - 5,
+		currentRect->w + 10,
+		currentRect->h + 10
 
 	);
 	if (!currentSelection->get_rectangle()->contains(x, y) && focusRect->contains(x, y)) {
@@ -401,12 +402,12 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 		rotatedY = currentSelection->scale(rotatedY + center.y);
 		//FXDCWindow dc(canvas);
 		//dc.drawPoint(rotatedX, rotatedY);
-		if (checkResizeArea(rotatedX, rotatedY)) { //if the cursor is in the area to click and drag resize
-			updateCursor(rotatedX, rotatedY); //update the cursor to drag arrows
+		if (checkResizeArea(ev->win_x, ev->win_y)) { //if the cursor is in the area to click and drag resize
+			updateCursor(ev->win_x, ev->win_y); //update the cursor to drag arrows
 		}
 		if (itemClicked == 1 && mdflag == 1) {
-			project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() + ev->win_x - ev->last_x);
-			project->placeables[currentIndex]->set_yPos(project->placeables[currentIndex]->get_yPos() + ev->win_y - ev->last_y);
+			project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() + (ev->win_x - ev->last_x)*project->get_gridSize()/10);
+			project->placeables[currentIndex]->set_yPos(project->placeables[currentIndex]->get_yPos() + (ev->win_y - ev->last_y)*project->get_gridSize()/10);
 			drawScreen();
 		}
 		if (resizeable && mdflag) { //if the cursor is in the area to resize, and the mouse is down

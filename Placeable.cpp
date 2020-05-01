@@ -263,8 +263,9 @@ bool Placeable::isClicked(int clickX, int clickY, FXDCWindow *dc)
 		clickX = rotatedX + center.x;
 		clickY = rotatedY + center.y;
 
+		dc->setForeground(FXRGB(0, 255, 0));
 		dc->drawEllipse(clickX, clickY, 5, 5);
-	if (rectangle->contains(scale(clickX), scale(clickY)))
+	if (rectangle->contains(clickX, clickY))
 		return true;
 
 	return false;
