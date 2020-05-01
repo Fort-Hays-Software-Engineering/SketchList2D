@@ -375,6 +375,7 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 // The mouse has moved, and a placeable is selected, move it
 long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 	FXEvent *ev = (FXEvent*)ptr;
+	FXDCWindow dc(canvas);
 
 	//set the default cursor state is a normal arrow cursor
 	canvas->setDefaultCursor(getApp()->getDefaultCursor(DEF_ARROW_CURSOR));
@@ -382,28 +383,16 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 
 	if (currentSelection != NULL) { //if there is a selected placeable
 		//rotate cursor against current selection
+
 		int tempX, tempY, rotatedX, rotatedY;
-		FXPoint center = FXPoint(currentSelection->get_xPos() + currentSelection->get_width() * .5,
-			                     currentSelection->get_yPos() + currentSelection->get_height() * .5);
-
-		//translate to origin
-		tempX = ev->win_x - center.x;
-		tempY = ev->win_y - center.y;
-
-
-		//rotate
-		rotatedX = tempX * cos(-currentSelection->get_angle() * PI / 180) - tempY * sin(-currentSelection->get_angle() * PI / 180);
-		rotatedY = tempX * sin(-currentSelection->get_angle() * PI / 180) + tempY * cos(-currentSelection->get_angle() * PI / 180);
-
-		//translate back to original position
-		rotatedX += center.x;
-		rotatedY += center.y;
-		rotatedX = currentSelection->scale(rotatedX + center.x);
-		rotatedY = currentSelection->scale(rotatedY + center.y);
-		//FXDCWindow dc(canvas);
-		//dc.drawPoint(rotatedX, rotatedY);
-		if (checkResizeArea(ev->win_x, ev->win_y)) { //if the cursor is in the area to click and drag resize
-			updateCursor(ev->win_x, ev->win_y); //update the cursor to drag arrows
+		FXRectangle *r = currentSelection->get_rectangle();
+		FXPoint center = FXPoint(r->x + r->w * .5,
+			                     r->y + r->h * .5);
+		FXPoint rotatedPoint = rotateClick(FXPoint(ev->win_x, ev->win_y), center, -currentSelection->get_angle());
+		
+		
+		if (checkResizeArea(rotatedPoint.x, rotatedPoint.y)) { //if the cursor is in the area to click and drag resize
+			updateCursor(rotatedPoint.x, rotatedPoint.y); //update the cursor to drag arrows
 		}
 		if (itemClicked == 1 && mdflag == 1) {
 			project->placeables[currentIndex]->set_xPos(project->placeables[currentIndex]->get_xPos() + (ev->win_x - ev->last_x)*project->get_gridSize()/10);
@@ -411,20 +400,9 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 			drawScreen();
 		}
 		if (resizeable && mdflag) { //if the cursor is in the area to resize, and the mouse is down
-			int lastX, lastY;
-			lastX = ev->last_x;
-			lastY = ev->last_y;
-			tempX = lastX - center.x;
-			tempY = lastY - center.y;
 
-			//rotate
-			lastX = tempX * cos(-currentSelection->get_angle() * PI / 180) - tempY * sin(-currentSelection->get_angle() * PI / 180);
-			lastY = tempX * sin(-currentSelection->get_angle() * PI / 180) + tempY * cos(-currentSelection->get_angle() * PI / 180);
-
-			//translate back to original position
-			lastX += center.x;
-			lastY += center.y;
-			resize(lastX, rotatedX, lastY, rotatedY); //resize the current selection
+			FXPoint rotatedLast = rotateClick(FXPoint(ev->last_x, ev->last_y), center, -currentSelection->get_angle());
+			resize(rotatedLast.x, rotatedPoint.x, rotatedLast.y, rotatedPoint.y); //resize the current selection
 		}
 	}
 	
@@ -455,6 +433,7 @@ long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
 	if (mdflag) {
 
 		// Mouse no longer down
+		resizeable = 0;
 		mdflag = 0;
 		itemClicked = 1;
 	}
@@ -467,6 +446,7 @@ void ProjectWindow::drawControlHandles()
 	FXDCWindow dc(canvas);
 	currentSelection->drawControlHandles(&dc);
 
+	
 	dc.setForeground(FXRGB(209, 0, 209));
 	FXRectangle* r = project->placeables[currentIndex]->get_rectangle();
 	dc.drawRectangle(r->x - 5,
@@ -619,13 +599,30 @@ void ProjectWindow::resize(int lastX, int curX, int lastY, int curY) {
 	}
 
 	drawScreen(); //update the canvas
-	widthText->setText(FXStringVal(project->placeables[currentIndex]->get_width())); //update the width in the text box
-	heightText->setText(FXStringVal(project->placeables[currentIndex]->get_height())); //update the height in the text box
+	displayUnits();
 
 	delete rightRect;
 	delete leftRect;
 	delete topRect;
 	delete bottomRect;
+}
+
+FXPoint ProjectWindow::rotateClick(FXPoint click, FXPoint center, int angle)
+{
+	int tempX, tempY, rotatedX, rotatedY;
+
+	//translate to origin
+	tempX = click.x - center.x;
+	tempY = click.y - center.y;
+
+	//rotate
+	rotatedX = tempX * cos(angle * PI / 180) - tempY * sin(angle * PI / 180);
+	rotatedY = tempX * sin(angle * PI / 180) + tempY * cos(angle * PI / 180);
+
+	//translate back to original position
+	click.x = rotatedX + center.x;
+	click.y = rotatedY + center.y;
+	return FXPoint(click.x, click.y);
 }
 
 // Paint the canvas

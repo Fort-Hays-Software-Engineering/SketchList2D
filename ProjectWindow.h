@@ -76,6 +76,7 @@ private:
 	bool checkResizeArea(int x, int y);
 	void updateCursor(int x, int y);
 	void resize(int lastX, int curX, int lastY, int curY);
+	FXPoint rotateClick(FXPoint click, FXPoint center, int angle);
 	// Scale coordinate to grid Size
 
 
