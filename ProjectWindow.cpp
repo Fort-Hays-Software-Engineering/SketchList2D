@@ -398,6 +398,25 @@ void ProjectWindow::drawControlHandles()
 {
 	FXDCWindow dc(canvas);
 	currentSelection->drawControlHandles(&dc);
+
+	dc.setForeground(FXRGB(209, 0, 209));
+	FXRectangle* r = project->placeables[currentIndex]->get_rectangle();
+	dc.drawRectangle(r->x - 5,
+		r->y - 5,
+		r->w + 10,
+		10);
+	dc.drawRectangle(r->x + r->w,
+		r->y - 5,
+		10,
+		r->h + 10);
+	dc.drawRectangle(r->x - 5,
+		r->y + r->h,
+		r->w + 10,
+		10);
+	dc.drawRectangle(r->x - 5,
+		r->y - 5,
+		10,
+		r->h + 10);
 	
 	
 
@@ -405,22 +424,23 @@ void ProjectWindow::drawControlHandles()
 
 void ProjectWindow::updateCursor(int x, int y) {
 	//rectangles to check which region the cursor is in
-	FXRectangle* topRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
-		project->placeables[currentIndex]->get_yPos() - 5,
-		project->placeables[currentIndex]->get_width() + 10,
+	FXRectangle* r = project->placeables[currentIndex]->get_rectangle();
+	FXRectangle* topRect = new FXRectangle(r->x - 5,
+		r->y - 5,
+		r->w + 10,
 		10);
-	FXRectangle* rightRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() + project->placeables[currentIndex]->get_width(),
-		project->placeables[currentIndex]->get_yPos() - 5,
-		project->placeables[currentIndex]->get_width() + 10,
-		project->placeables[currentIndex]->get_height() + 10);
-	FXRectangle* bottomRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
-		project->placeables[currentIndex]->get_yPos() + project->placeables[currentIndex]->get_height(),
-		project->placeables[currentIndex]->get_width() + 10,
-		project->placeables[currentIndex]->get_height() + 10);
-	FXRectangle* leftRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
-		project->placeables[currentIndex]->get_yPos() - 5,
+	FXRectangle* rightRect = new FXRectangle(r->x + r->w,
+		r->y - 5,
 		10,
-		project->placeables[currentIndex]->get_height() + 10);
+		r->h + 10);
+	FXRectangle* bottomRect = new FXRectangle(r->x - 5,
+		r->y + r->h,
+		r->w + 10,
+		10);
+	FXRectangle* leftRect = new FXRectangle(r->x - 5,
+		r->y - 5,
+		10,
+		r->h + 10);
 
 	if (topRect->contains(x, y)) { //if in top region
 		if (rightRect->contains(x, y)) { //and right region
@@ -476,22 +496,23 @@ void ProjectWindow::updateCursor(int x, int y) {
 
 void ProjectWindow::resize(int lastX, int curX, int lastY, int curY) {
 	//rectangles to check which region the cursor is in
-	FXRectangle* topRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
-		project->placeables[currentIndex]->get_yPos() - 5,
-		project->placeables[currentIndex]->get_width() + 10,
+	FXRectangle* r = project->placeables[currentIndex]->get_rectangle();
+	FXRectangle* topRect = new FXRectangle(r->x - 5,
+		r->y - 5,
+		r->w + 10,
 		10);
-	FXRectangle* rightRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() + project->placeables[currentIndex]->get_width(),
-		project->placeables[currentIndex]->get_yPos() - 5,
-		project->placeables[currentIndex]->get_width() + 10,
-		project->placeables[currentIndex]->get_height() + 10);
-	FXRectangle* bottomRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
-		project->placeables[currentIndex]->get_yPos() + project->placeables[currentIndex]->get_height(),
-		project->placeables[currentIndex]->get_width() + 10,
-		project->placeables[currentIndex]->get_height() + 10);
-	FXRectangle* leftRect = new FXRectangle(project->placeables[currentIndex]->get_xPos() - 5,
-		project->placeables[currentIndex]->get_yPos() - 5,
+	FXRectangle* rightRect = new FXRectangle(r->x + r->w,
+		r->y - 5,
 		10,
-		project->placeables[currentIndex]->get_height() + 10);
+		r->h + 10);
+	FXRectangle* bottomRect = new FXRectangle(r->x - 5,
+		r->y + r->h,
+		r->w + 10,
+		10);
+	FXRectangle* leftRect = new FXRectangle(r->x - 5,
+		r->y - 5,
+		10,
+		r->h + 10);
 
 	//if in the top region
 	if (topRect->contains(curX, curY)) {
