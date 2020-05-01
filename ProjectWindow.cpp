@@ -328,13 +328,18 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 	clickX = ev->click_x;
 	clickY = ev->click_y;
 
-	int xStart, xEnd, yStart, yEnd;
-	int rotatedX, rotatedY;
-
+	FXPoint rotatedPoint = FXPoint(clickX, clickY);
+	if (currentSelection != NULL)
+	{
+		FXRectangle *r = currentSelection->get_rectangle();
+		FXPoint center = FXPoint(r->x + r->w * .5,
+			r->y + r->h * .5);
+		rotatedPoint = rotateClick(rotatedPoint, center, -currentSelection->get_angle());
+	}
 	FXDCWindow dc(canvas);
 	if (mdflag == 0) {
 
-		if (checkResizeArea(clickX, clickY)) {
+		if (checkResizeArea(rotatedPoint.x, rotatedPoint.y)) {
 			resizeable = 1;
 		}
 		else {
@@ -346,7 +351,7 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 					currentSelection = project->placeables[i];
 					currentIndex = i;
 					drawScreen();
-					project->placeables[i]->isClicked(clickX, clickY, &dc);
+					project->placeables[i]->isClicked(clickX, clickY, &dc); //DEBUG TO DRAW THE CLICK
 					itemClicked = 1;
 					mdflag = 1;
 					displayUnits();
@@ -355,14 +360,12 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 				}
 				else { // No item clicked, Deselect
 					deselect();
-					project->placeables[i]->isClicked(clickX, clickY, &dc);
+					project->placeables[i]->isClicked(clickX, clickY, &dc); //DEBUG TO DRAW THE CLICK
 				}
 
 			}
 		}
 	}
-	//use data targets to put this placeable's info in onscreen controls
-
 
 	itemClicked = 0;
 	mdflag = 1;
@@ -384,7 +387,6 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 	if (currentSelection != NULL) { //if there is a selected placeable
 		//rotate cursor against current selection
 
-		int tempX, tempY, rotatedX, rotatedY;
 		FXRectangle *r = currentSelection->get_rectangle();
 		FXPoint center = FXPoint(r->x + r->w * .5,
 			                     r->y + r->h * .5);
@@ -449,22 +451,22 @@ void ProjectWindow::drawControlHandles()
 	
 	dc.setForeground(FXRGB(209, 0, 209));
 	FXRectangle* r = project->placeables[currentIndex]->get_rectangle();
-	dc.drawRectangle(r->x - 5,
-		r->y - 5,
-		r->w + 10,
+	dc.drawRectangle(r->x - 10,
+		r->y - 10,
+		r->w + 20,
 		10);
 	dc.drawRectangle(r->x + r->w,
-		r->y - 5,
+		r->y - 10,
 		10,
-		r->h + 10);
-	dc.drawRectangle(r->x - 5,
+		r->h + 20);
+	dc.drawRectangle(r->x - 10,
 		r->y + r->h,
-		r->w + 10,
+		r->w + 20,
 		10);
-	dc.drawRectangle(r->x - 5,
-		r->y - 5,
+	dc.drawRectangle(r->x - 10,
+		r->y - 10,
 		10,
-		r->h + 10);
+		r->h + 20);
 	
 	
 
@@ -490,22 +492,22 @@ void ProjectWindow::displayUnits() {
 void ProjectWindow::updateCursor(int x, int y) {
 	//rectangles to check which region the cursor is in
 	FXRectangle* r = project->placeables[currentIndex]->get_rectangle();
-	FXRectangle* topRect = new FXRectangle(r->x - 5,
-		r->y - 5,
-		r->w + 10,
+	FXRectangle* topRect = new FXRectangle(r->x - 10,
+		r->y - 10,
+		r->w + 20,
 		10);
 	FXRectangle* rightRect = new FXRectangle(r->x + r->w,
-		r->y - 5,
+		r->y - 10,
 		10,
-		r->h + 10);
-	FXRectangle* bottomRect = new FXRectangle(r->x - 5,
+		r->h + 20);
+	FXRectangle* bottomRect = new FXRectangle(r->x - 10,
 		r->y + r->h,
-		r->w + 10,
+		r->w + 20,
 		10);
-	FXRectangle* leftRect = new FXRectangle(r->x - 5,
-		r->y - 5,
+	FXRectangle* leftRect = new FXRectangle(r->x - 10,
+		r->y - 10,
 		10,
-		r->h + 10);
+		r->h + 20);
 
 	if (topRect->contains(x, y)) { //if in top region
 		if (rightRect->contains(x, y)) { //and right region
@@ -562,40 +564,46 @@ void ProjectWindow::updateCursor(int x, int y) {
 void ProjectWindow::resize(int lastX, int curX, int lastY, int curY) {
 	//rectangles to check which region the cursor is in
 	FXRectangle* r = project->placeables[currentIndex]->get_rectangle();
-	FXRectangle* topRect = new FXRectangle(r->x - 5,
-		r->y - 5,
-		r->w + 10,
+	FXRectangle* topRect = new FXRectangle(r->x - 10,
+		r->y - 10,
+		r->w + 20,
 		10);
 	FXRectangle* rightRect = new FXRectangle(r->x + r->w,
-		r->y - 5,
+		r->y - 10,
 		10,
-		r->h + 10);
-	FXRectangle* bottomRect = new FXRectangle(r->x - 5,
+		r->h + 20);
+	FXRectangle* bottomRect = new FXRectangle(r->x - 10,
 		r->y + r->h,
-		r->w + 10,
+		r->w + 20,
 		10);
-	FXRectangle* leftRect = new FXRectangle(r->x - 5,
-		r->y - 5,
+	FXRectangle* leftRect = new FXRectangle(r->x - 10,
+		r->y - 10,
 		10,
-		r->h + 10);
+		r->h + 20);
 
+	// THE REASON THE WHOLE THING DEFORMS IS THE ANGLE!
 	//if in the top region
+	int grid = project->get_gridSize();
+	int xDir = -1;
+	int yDir = -1;
+	if (curX > lastX) xDir = 1;
+	if (curY > lastY) yDir = 1;
 	if (topRect->contains(curX, curY)) {
-		currentSelection->set_height(currentSelection->get_height() + lastY - curY); //adjust height based on mouse movement
-		currentSelection->set_yPos(currentSelection->get_yPos() + curY - lastY); //since this is the top, we have to adjust the y position
+		currentSelection->set_height(currentSelection->get_height() - yDir*grid); //adjust height based on mouse movement
+		currentSelection->set_yPos(currentSelection->get_yPos() + yDir*grid); //since this is the top, we have to adjust the y position
 	}
 	//check if in right region
 	if (rightRect->contains(curX, curY)) {
-		currentSelection->set_width(currentSelection->get_width() + curX - lastX); //adjust the width
+		currentSelection->set_width(currentSelection->get_width() + xDir * grid); //adjust the width
 	}
 	//check if in bottom region
 	if (bottomRect->contains(curX, curY)) {
-		currentSelection->set_height(currentSelection->get_height() + curY - lastY); //adjust the height
+		currentSelection->set_height(currentSelection->get_height() + yDir * grid); //adjust the height
 	}
 	//check if in left region
 	if (leftRect->contains(curX, curY)) {
-		currentSelection->set_width(currentSelection->get_width() + lastX - curX); //adjust the width
-		currentSelection->set_xPos(currentSelection->get_xPos() + curX - lastX); //since this is the left, we have to adjust the x position
+		currentSelection->set_width(currentSelection->get_width() - xDir * grid); //adjust the width
+		currentSelection->set_xPos(currentSelection->get_xPos() + xDir * grid); //since this is the left, we have to adjust the x position
 	}
 
 	drawScreen(); //update the canvas
