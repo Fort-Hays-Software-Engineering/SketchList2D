@@ -32,6 +32,7 @@ private:
 
 	FXHorizontalFrame *widthFrame;              // Width frame of the data panel
 	FXTextField       *widthText;
+	FXComboBox		  *widthFraction;
 
 	FXHorizontalFrame *cabinetFrame;
 	FXText          *cabinet;                 //cabinet test
@@ -42,6 +43,7 @@ private:
 
 	FXHorizontalFrame *heightFrame;             // height frame of the data panel
 	FXTextField       *heightText;
+	FXComboBox		  *heightFraction;
 
 	FXSlider		  *gridSizeSlider;			// Slider selector for adjustable grid Size
 	FXTextField		  *gridSizeDisplay;
@@ -120,7 +122,7 @@ public:
 	void drawScreen(); //draw the canvas
 
 	FXApp* getApp() const { return (FXApp*)FXMainWindow::getApp(); }
-
+	void displayUnits();
 	long onCmdGridSize(FXObject*, FXSelector, void*);
 	long onCmdUpdateSpecs(FXObject*, FXSelector, void*);
 	long deselect();
@@ -166,4 +168,5 @@ public:
 };
 
 void configurePlaceableComboBox(FXComboBox *comboBox);
+void configureFractionComboBox(FXComboBox *box);
 #endif // !ProjectWindow_H

@@ -64,10 +64,14 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	widthFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(widthFrame, "Width", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
 	widthText = new FXTextField(widthFrame, 5, NULL, 0, TEXTFIELD_INTEGER | FRAME_LINE);
+	widthFraction = new FXComboBox(widthFrame, 1, NULL, 0, COMBOBOX_STATIC, 90, 90, 90, 90, 2, 2, 2, 2);
+	configureFractionComboBox(widthFraction);
 
 	heightFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(heightFrame, "Height", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
 	heightText = new FXTextField(heightFrame, 5, NULL, 0, TEXTFIELD_INTEGER | FRAME_LINE);
+	heightFraction = new FXComboBox(heightFrame, 1, NULL, 0, COMBOBOX_STATIC, 90, 90, 90, 90, 2, 2, 2, 2);
+	configureFractionComboBox(heightFraction);
 
 	angleFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(angleFrame, "Angle", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
@@ -170,6 +174,26 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	// Recent files
 	mrufiles.setTarget(this);
 	mrufiles.setSelector(ID_OPEN_RECENT);
+}
+
+void configureFractionComboBox(FXComboBox *box) {
+	box->appendItem("in");        // 0
+	box->appendItem("1/16\"");    // 1
+	box->appendItem("1/8\"");     // 2
+	box->appendItem("3/16\"");    // 3
+	box->appendItem("1/4\"");     // 4
+	box->appendItem("5/16\"");    // 5
+	box->appendItem("3/8\"");     // 6
+	box->appendItem("7/16\"");    // 7
+	box->appendItem("1/2\"");     // 8 
+	box->appendItem("9/16\"");    // 9
+	box->appendItem("5/8\"");     // 10
+	box->appendItem("11/16\"");   // 11
+	box->appendItem("3/4\"");     // 12
+	box->appendItem("13/16\"");   // 13
+	box->appendItem("7/8\"");     // 14
+	box->appendItem("15/16\"");   // 15
+	box->setNumVisible(8);
 }
 
 void configurePlaceableComboBox(FXComboBox *comboBox) {
@@ -289,9 +313,7 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 					drawScreen();
 					itemClicked = 1;
 					mdflag = 1;
-					widthText->setText(FXStringVal(project->placeables[i]->get_width()));
-					heightText->setText(FXStringVal(project->placeables[i]->get_height()));
-					angleText->setText(FXStringVal(project->placeables[i]->get_angle()));
+					displayUnits();
 					return 1;
 
 				}
@@ -377,6 +399,8 @@ long ProjectWindow::deselect() {
 	widthText->setText("");
 	heightText->setText("");
 	angleText->setText("");
+	widthFraction->setCurrentItem(0);
+	heightFraction->setCurrentItem(0);
 	return 1;
 }
 
@@ -421,6 +445,23 @@ void ProjectWindow::drawControlHandles()
 	
 
 }
+// Display Units of selected placeable
+void ProjectWindow::displayUnits() {
+	// Set Inches for width
+	widthText->setText(FXStringVal(currentSelection->get_width() / 16));
+	// Set Fraction of Inches
+	widthFraction->setCurrentItem(currentSelection->get_width() % 16);
+	// Set Inches for height
+	heightText->setText(FXStringVal(currentSelection->get_height() / 16));
+	heightFraction->setCurrentItem(currentSelection->get_height() % 16);
+	// Set Fraction for Height
+
+	// No changes needed to angle
+	angleText->setText(FXStringVal(currentSelection->get_angle()));
+
+
+}
+
 
 void ProjectWindow::updateCursor(int x, int y) {
 	//rectangles to check which region the cursor is in
@@ -584,9 +625,13 @@ long ProjectWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 //Update Cabinet Specifications
 // Change Grid Size With Slider
 long ProjectWindow::onCmdUpdateSpecs(FXObject*, FXSelector, void*) {
-	
-	currentSelection->set_height(FXIntVal(heightText->getText()));
-	currentSelection->set_width(FXIntVal(widthText->getText()));
+	FXint w, h;
+	h = (FXIntVal(heightText->getText()) * 16) + heightFraction->getCurrentItem();
+	w = (FXIntVal(widthText->getText()) * 16) + widthFraction->getCurrentItem();
+	currentSelection->set_height(h);
+
+	currentSelection->set_width(w);
+
 	currentSelection->set_angle(FXIntVal(angleText->getText()));
 
 	drawScreen();

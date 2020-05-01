@@ -172,8 +172,8 @@ bool Placeable::isClicked(int clickX, int clickY)
 	FXPoint center = FXPoint(xPos + width * .5, yPos + height * .5);
 
 		//translate to origin
-		tempX = clickX - scale(center.x);
-		tempY = clickY - scale(center.y);
+		tempX = scale(clickX - center.x);
+		tempY = scale(clickY - center.y);
 
 		//rotate
 		rotatedX = tempX * cos(-angle * PI / 180) - tempY * sin(-angle * PI / 180);
