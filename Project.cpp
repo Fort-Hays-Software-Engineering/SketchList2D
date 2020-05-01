@@ -12,6 +12,9 @@ Project::Project()
 void Project::set_gridSize(int size)
 {
 	gridSize = size;
+	for (int i = 0; i < placeableCount; i++) {
+		placeables[i]->set_curgrid(size);
+	}
 
 }
 
@@ -69,7 +72,7 @@ void Project::load(FXStream& stream)
 
 void Project::addPlaceable(int x, int y, int h, int w)
 {
-	placeables[placeableCount] = new Placeable(x, y, h, w);
+	placeables[placeableCount] = new Placeable(x, y, h, w, 0, x);
 	placeableCount++;
 }
 

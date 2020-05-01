@@ -50,7 +50,7 @@ Placeable::Placeable(int x, int y, int h, int w)
 	height = h;
 	width = w;
 	angle = 0;
-	rectangle = new FXRectangle(x, y, w, h);
+	rectangle = new FXRectangle(x, y, scale(w), scale(h));
 	curgrid = 1;
 
 	p[0] = FXPoint(xPos, yPos);
@@ -66,9 +66,25 @@ Placeable::Placeable(int x, int y, int h, int w, int a)
 	height = h;
 	width = w;
 	angle = a;
-	rectangle = new FXRectangle(x, y, w, h);
+	rectangle = new FXRectangle(x, y, scale(w), scale(h));
 	updatePoints();
 	curgrid = 1;
+}
+
+Placeable::Placeable(int x, int y, int h, int w, int a, int grid) {
+	xPos = x;
+	yPos = y;
+	height = h;
+	width = w;
+	angle = a;
+	curgrid = grid;
+	rectangle = new FXRectangle(scale(x), scale(y), scale(w), scale(h));
+
+
+	p[0] = FXPoint(xPos, yPos);
+	p[1] = FXPoint(xPos + width, yPos);
+	p[2] = FXPoint(xPos + width, yPos + height);
+	p[3] = FXPoint(xPos, yPos + height);
 }
 
 
@@ -80,28 +96,28 @@ FXRectangle * Placeable::get_rectangle()
 void Placeable::set_xPos(int newX)
 {
 	xPos = newX;
-	rectangle->x = newX;
+	rectangle->x = scale(newX);
 	updatePoints();
 }
 
 void Placeable::set_yPos(int newY)
 {
 	yPos = newY;
-	rectangle->y = newY;
+	rectangle->y = scale(newY);
 	updatePoints();
 }
 
 void Placeable::set_width(int newW)
 {
 	width = newW;
-	rectangle->w = newW;
+	rectangle->w = scale(newW);
 	updatePoints();
 }
 
 void Placeable::set_height(int newH)
 {
 	height = newH;
-	rectangle->h = newH;
+	rectangle->h = scale(newH);
 	updatePoints();
 }
 
@@ -136,6 +152,16 @@ int Placeable::get_width()
 	return width;
 }
 
+void Placeable::set_curgrid(int grid)
+{
+	curgrid = grid;
+	rectangle->h = scale(height);
+	rectangle->w = scale(width);
+	rectangle->x = scale(xPos);
+	rectangle->y = scale(yPos);
+
+}
+
 FXint Placeable::scale(FXint x) {
 	return (x * 10) / curgrid;
 }
@@ -156,6 +182,8 @@ bool Placeable::isClicked(int clickX, int clickY)
 		//translate back to original position
 		clickX = rotatedX + center.x;
 		clickY = rotatedY + center.y;
+
+
 	if (rectangle->contains(scale(clickX), scale(clickY)))
 		return true;
 
@@ -172,6 +200,9 @@ void Placeable::draw(FXDCWindow* dc, int grid)
 	dc->drawLine(scale(p[1].x), scale(p[1].y), scale(p[2].x), scale(p[2].y));
 	dc->drawLine(scale(p[2].x), scale(p[2].y), scale(p[3].x), scale(p[3].y));
 	dc->drawLine(scale(p[3].x), scale(p[3].y), scale(p[0].x), scale(p[0].y));
+
+	dc->setForeground(FXRGB(0, 209, 209));
+	dc->drawRectangle(rectangle->x, rectangle->y, rectangle->w, rectangle->h);
 }
 
 void Placeable::drawControlHandles(FXDCWindow * dc)

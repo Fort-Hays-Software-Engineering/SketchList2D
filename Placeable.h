@@ -23,6 +23,7 @@ public:
 	Placeable();
 	Placeable(int x, int y, int h, int w);
 	Placeable(int x, int y, int h, int w, int a);
+	Placeable(int x, int y, int h, int w, int a, int grid);
 	FXRectangle* get_rectangle();
 	void set_xPos(int newX);
 	void set_yPos(int newY);
@@ -35,6 +36,7 @@ public:
 	void set_width(int newWidth);
 	int get_height();
 	int get_width();
+	void set_curgrid(int grid);
 	bool isClicked(int clickX, int clickY);
 
 	void draw(FXDCWindow* dc, int grid);
