@@ -91,7 +91,34 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	new FXLabel(LeftPanel, "Grid Size", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
 	gridSizeSlider = new FXSlider(LeftPanel, this, ID_GRIDSIZE, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0);
 	gridSizeSlider->setRange(1, 6);
-
+	switch (project->get_gridSize()) {
+	case 1:
+		gridSizeDisplay->setText("1/16\"");
+		gridSizeSlider->setValue(1);
+		break;
+	case 2:
+		gridSizeDisplay->setText("1/8\"");
+		gridSizeSlider->setValue(2);
+		break;
+	case 4:
+		gridSizeDisplay->setText("1/4\"");
+		gridSizeSlider->setValue(3);
+		break;
+	case 8:
+		gridSizeDisplay->setText("1/2\"");
+		gridSizeSlider->setValue(4);
+		break;
+	case 16:
+		gridSizeDisplay->setText("1\"");
+		gridSizeSlider->setValue(5);
+		break;
+	case 32:
+		gridSizeDisplay->setText("2\"");
+		gridSizeSlider->setValue(6);
+		break;
+	default:
+		gridSizeDisplay->setText("N/A");
+	}
 
 
 	// Status bar
@@ -171,13 +198,13 @@ long ProjectWindow::onCmdNewPlacable(FXObject*, FXSelector, void*) {
 	FXDCWindow dc(canvas); //get the canvas
 	switch (placeableTypeComboBox->getCurrentItem()) {
 	case 0:
-		project->addPlaceable(project->get_gridSize(), project->get_gridSize(), 500, 5);
+		project->addPlaceable(project->get_gridSize(), project->get_gridSize(), 1920, 64); // 4" x 10' wall
 		break;
 	case 1:
-		project->addPlaceable(project->get_gridSize(), project->get_gridSize(), 5, 500);
+		project->addPlaceable(project->get_gridSize(), project->get_gridSize(), 64, 1920); // 4" x 10' wall
 		break;
 	case 2:
-		project->addPlaceable(project->get_gridSize(), project->get_gridSize(), 50, 50);
+		project->addPlaceable(project->get_gridSize(), project->get_gridSize(), 384, 480); // standard 24" by 30" cabinet
 		break;
 	default:
 		break;
@@ -199,10 +226,10 @@ void ProjectWindow::drawScreen()
 	dc.fillRectangle(0, 0, canvasWidth, canvasHeight);
 	dc.setForeground(drawColor);
 
-	for (int x = 0; x < canvasWidth; x = x + 16) {
+	for (int x = 0; x < canvasWidth; x = x + 10) {
 		dc.drawLine(x, 0, x, canvasHeight);
 	}
-	for (int y = 0; y < canvasHeight; y = y + 16) {
+	for (int y = 0; y < canvasHeight; y = y + 10) {
 		dc.drawLine(0, y, canvasWidth, y);
 	}
 
@@ -210,7 +237,7 @@ void ProjectWindow::drawScreen()
 
 	//draw placeables
 	for (int i = 0; i < project->get_placeableCount(); i++) {
-		project->placeables[i]->draw(&dc);
+		project->placeables[i]->draw(&dc, project->get_gridSize());
 	}
 	if(currentSelection != NULL)
 		drawControlHandles();
@@ -553,27 +580,27 @@ long ProjectWindow::onCmdGridSize(FXObject*, FXSelector, void*) {
 	switch (scale) {
 	case 1:
 		displayText = "1/16\"";
-		grid = 16;
+		grid = 1;
 		break;
 	case 2:
 		displayText = "1/8\"";
-		grid = 32;
+		grid = 2;
 		break;
 	case 3:
 		displayText = "1/4\"";
-		grid = 64;
+		grid = 4;
 		break;
 	case 4:
 		displayText = "1/2\"";
-		grid = 128;
+		grid = 8;
 		break;
 	case 5:
 		displayText = "1\"";
-		grid = 256;
+		grid = 16;
 		break;
 	case 6:
 		displayText = "2\"";
-		grid = 512;
+		grid = 32;
 		break;
 	default:
 		displayText = "";

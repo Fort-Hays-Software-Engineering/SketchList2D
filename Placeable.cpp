@@ -35,6 +35,7 @@ Placeable::Placeable()
 	height = 50;
 	width = 50;
 	angle = 0;
+	curgrid = 1;
 
 	p[0] = FXPoint(xPos, yPos);
 	p[1] = FXPoint(xPos + width, yPos);
@@ -50,6 +51,7 @@ Placeable::Placeable(int x, int y, int h, int w)
 	width = w;
 	angle = 0;
 	rectangle = new FXRectangle(x, y, w, h);
+	curgrid = 1;
 
 	p[0] = FXPoint(xPos, yPos);
 	p[1] = FXPoint(xPos + width, yPos);
@@ -66,6 +68,7 @@ Placeable::Placeable(int x, int y, int h, int w, int a)
 	angle = a;
 	rectangle = new FXRectangle(x, y, w, h);
 	updatePoints();
+	curgrid = 1;
 }
 
 
@@ -133,6 +136,9 @@ int Placeable::get_width()
 	return width;
 }
 
+FXint Placeable::scale(FXint x) {
+	return (x * 10) / curgrid;
+}
 bool Placeable::isClicked(int clickX, int clickY)
 {
 	//rotate click to match rectangle
@@ -140,8 +146,8 @@ bool Placeable::isClicked(int clickX, int clickY)
 	FXPoint center = FXPoint(xPos + width * .5, yPos + height * .5);
 
 		//translate to origin
-		tempX = clickX - center.x;
-		tempY = clickY - center.y;
+		tempX = clickX - scale(center.x);
+		tempY = clickY - scale(center.y);
 
 		//rotate
 		rotatedX = tempX * cos(-angle * PI / 180) - tempY * sin(-angle * PI / 180);
@@ -150,20 +156,22 @@ bool Placeable::isClicked(int clickX, int clickY)
 		//translate back to original position
 		clickX = rotatedX + center.x;
 		clickY = rotatedY + center.y;
-	if (rectangle->contains(clickX, clickY))
+	if (rectangle->contains(scale(clickX), scale(clickY)))
 		return true;
 
 	return false;
 }
 
-void Placeable::draw(FXDCWindow* dc)
+void Placeable::draw(FXDCWindow* dc, int grid)
 {
-	
+	// Set divisor to determine how much each 10px x 10x grid square represents
+	curgrid = grid;
+
 	//draw lines betweeen each point to form a rectangle
-	dc->drawLine(p[0].x, p[0].y, p[1].x, p[1].y);
-	dc->drawLine(p[1].x, p[1].y, p[2].x, p[2].y);
-	dc->drawLine(p[2].x, p[2].y, p[3].x, p[3].y);
-	dc->drawLine(p[3].x, p[3].y, p[0].x, p[0].y);
+	dc->drawLine(scale(p[0].x), scale(p[0].y), scale(p[1].x), scale(p[1].y));
+	dc->drawLine(scale(p[1].x), scale(p[1].y), scale(p[2].x), scale(p[2].y));
+	dc->drawLine(scale(p[2].x), scale(p[2].y), scale(p[3].x), scale(p[3].y));
+	dc->drawLine(scale(p[3].x), scale(p[3].y), scale(p[0].x), scale(p[0].y));
 }
 
 void Placeable::drawControlHandles(FXDCWindow * dc)
@@ -178,7 +186,7 @@ void Placeable::drawControlHandles(FXDCWindow * dc)
 
 	//rotate points
 	int tempX, tempY, rotatedX, rotatedY;
-	FXPoint center = FXPoint(xPos + width * .5, yPos + height * .5);
+	FXPoint center = FXPoint(scale(xPos) + width * .5, scale(yPos) + height * .5);
 	//rotate each point
 	for (int i = 0; i < 4; i++) {
 		//translate to origin
@@ -195,10 +203,10 @@ void Placeable::drawControlHandles(FXDCWindow * dc)
 	}
 	//draw lines
 	dc->setForeground(FXRGB(209, 209, 209));
-	dc->drawLine(select[0].x, select[0].y, select[1].x, select[1].y);
-	dc->drawLine(select[1].x, select[1].y, select[2].x, select[2].y);
-	dc->drawLine(select[2].x, select[2].y, select[3].x, select[3].y);
-	dc->drawLine(select[3].x, select[3].y, select[0].x, select[0].y);
+	dc->drawLine(scale(select[0].x), scale(select[0].y), scale(select[1].x), scale(select[1].y));
+	dc->drawLine(scale(select[1].x), scale(select[1].y), scale(select[2].x), scale(select[2].y));
+	dc->drawLine(scale(select[2].x), scale(select[2].y), scale(select[3].x), scale(select[3].y));
+	dc->drawLine(scale(select[3].x), scale(select[3].y), scale(select[0].x), scale(select[0].y));
 }
 
 void Placeable::save(FXStream& stream)

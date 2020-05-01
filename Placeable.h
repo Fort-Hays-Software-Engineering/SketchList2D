@@ -15,7 +15,8 @@ private:
 	int s7;							// placeholder variable for another specification
 	FXRectangle* rectangle;         // The unrotated rectangle for the placeale
 	FXPoint p[4];                   // the points of the rotated rectangle
-
+	FXint scale(FXint x);           // scales the coordinates
+	FXint curgrid;					// current grid for scaling
 	void updatePoints();
 
 public:
@@ -36,7 +37,7 @@ public:
 	int get_width();
 	bool isClicked(int clickX, int clickY);
 
-	void draw(FXDCWindow* dc);
+	void draw(FXDCWindow* dc, int grid);
 	void drawControlHandles(FXDCWindow* dc);
 
 	FXDataTarget	   heightTarget;			// Data target for height box
