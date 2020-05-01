@@ -165,15 +165,17 @@ void Placeable::set_curgrid(int grid)
 FXint Placeable::scale(FXint x) {
 	return (x * 10) / curgrid;
 }
-bool Placeable::isClicked(int clickX, int clickY)
+bool Placeable::isClicked(int clickX, int clickY, FXDCWindow *dc)
 {
+	dc->setForeground(FXRGB(255, 0, 0));
+	dc->drawEllipse(clickX, clickY, 5, 5);
 	//rotate click to match rectangle
 	int tempX, tempY, rotatedX, rotatedY;
-	FXPoint center = FXPoint(xPos + width * .5, yPos + height * .5);
+	FXPoint center = FXPoint(rectangle->x + rectangle->w * .5, rectangle->y + rectangle->h * .5);
 
 		//translate to origin
-		tempX = scale(clickX - center.x);
-		tempY = scale(clickY - center.y);
+		tempX = clickX - center.x;
+		tempY = clickY - center.y;
 
 		//rotate
 		rotatedX = tempX * cos(-angle * PI / 180) - tempY * sin(-angle * PI / 180);
@@ -183,7 +185,7 @@ bool Placeable::isClicked(int clickX, int clickY)
 		clickX = rotatedX + center.x;
 		clickY = rotatedY + center.y;
 
-
+		dc->drawEllipse(clickX, clickY, 5, 5);
 	if (rectangle->contains(scale(clickX), scale(clickY)))
 		return true;
 

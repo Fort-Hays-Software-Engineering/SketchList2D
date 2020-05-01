@@ -15,7 +15,7 @@ private:
 	int s7;							// placeholder variable for another specification
 	FXRectangle* rectangle;         // The unrotated rectangle for the placeale
 	FXPoint p[4];                   // the points of the rotated rectangle
-	FXint scale(FXint x);           // scales the coordinates
+	
 	FXint curgrid;					// current grid for scaling
 	void updatePoints();
 
@@ -37,8 +37,8 @@ public:
 	int get_height();
 	int get_width();
 	void set_curgrid(int grid);
-	bool isClicked(int clickX, int clickY);
-
+	bool isClicked(int clickX, int clickY, FXDCWindow* dc);
+	FXint scale(FXint x);           // scales the coordinates
 	void draw(FXDCWindow* dc, int grid);
 	void drawControlHandles(FXDCWindow* dc);
 

@@ -307,10 +307,11 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 			//iterate through placeables seeing if this position is inside one of the rectangles
 			for (int i = 0; i < project->get_placeableCount(); i++) {
 
-				if (project->placeables[i]->isClicked(clickX, clickY)) {
+				if (project->placeables[i]->isClicked(clickX, clickY, &dc)) {
 					currentSelection = project->placeables[i];
 					currentIndex = i;
 					drawScreen();
+					project->placeables[i]->isClicked(clickX, clickY, &dc);
 					itemClicked = 1;
 					mdflag = 1;
 					displayUnits();
@@ -319,6 +320,7 @@ long ProjectWindow::onMouseDown(FXObject*, FXSelector, void* ptr) {
 				}
 				else { // No item clicked, Deselect
 					deselect();
+					project->placeables[i]->isClicked(clickX, clickY, &dc);
 				}
 
 			}
@@ -353,6 +355,7 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 		tempX = ev->win_x - center.x;
 		tempY = ev->win_y - center.y;
 
+
 		//rotate
 		rotatedX = tempX * cos(-currentSelection->get_angle() * PI / 180) - tempY * sin(-currentSelection->get_angle() * PI / 180);
 		rotatedY = tempX * sin(-currentSelection->get_angle() * PI / 180) + tempY * cos(-currentSelection->get_angle() * PI / 180);
@@ -360,6 +363,10 @@ long ProjectWindow::onMouseMove(FXObject*, FXSelector, void* ptr) {
 		//translate back to original position
 		rotatedX += center.x;
 		rotatedY += center.y;
+		rotatedX = currentSelection->scale(rotatedX + center.x);
+		rotatedY = currentSelection->scale(rotatedY + center.y);
+		//FXDCWindow dc(canvas);
+		//dc.drawPoint(rotatedX, rotatedY);
 		if (checkResizeArea(rotatedX, rotatedY)) { //if the cursor is in the area to click and drag resize
 			updateCursor(rotatedX, rotatedY); //update the cursor to drag arrows
 		}
