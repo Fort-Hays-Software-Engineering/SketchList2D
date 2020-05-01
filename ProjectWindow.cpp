@@ -76,22 +76,29 @@ ProjectWindow::ProjectWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Desi
 	angleFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	new FXLabel(angleFrame, "Angle", NULL, JUSTIFY_CENTER_X | LAYOUT_FILL_X);
 	angleText = new FXTextField(angleFrame, 5, NULL, 0, TEXTFIELD_INTEGER | FRAME_LINE);
+	
 
-	new FXButton(LeftPanel, "&Update", NULL, this, ID_UPDATESPECS, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
+	
 	unitsFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
-	feetRadio = new FXRadioButton(unitsFrame, "Feet");
-	inchRadio = new FXRadioButton(unitsFrame, "inches");
-	//set up so these radio buttons are connected to the same data selector
 
+	
+
+	
+	//set up so these radio buttons are connected to the same data selector
+	//feetRadio = new FXRadioButton(unitsFrame, "Feet");
+	//inchRadio = new FXRadioButton(unitsFrame, "inches");
 
 	canvas = new FXCanvas(contents, this, ID_CANVAS, FRAME_SUNKEN | FRAME_THICK | LAYOUT_FILL_X | LAYOUT_FILL_Y | LAYOUT_FILL_ROW | LAYOUT_FILL_COLUMN);
 
 
-	cabinetFrame = new FXHorizontalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
-	new FXLabel(cabinetFrame, "Cabinet", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
-	cabinet = new FXText(cabinetFrame);
+	cabinetFrame = new FXVerticalFrame(placeableDataPanel, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
+	new FXLabel(cabinetFrame, "Cabinet Name", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
+	cabinet = new FXTextField(cabinetFrame, 20, NULL, 0, TEXTFIELD_NORMAL | FRAME_LINE);
+	new FXButton(cabinetFrame, "&Update", NULL, this, ID_UPDATESPECS, FRAME_THICK | FRAME_RAISED | LAYOUT_FILL_X | LAYOUT_TOP | LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 5, 5);
+
 	
-	gridSizeDisplay = new FXTextField(LeftPanel, 5, NULL, 0, TEXTFIELD_INTEGER | FRAME_LINE);
+
+	gridSizeDisplay = new FXTextField(LeftPanel, 5, NULL, 0, TEXTFIELD_READONLY | FRAME_LINE);
 	new FXLabel(LeftPanel, "Grid Size", NULL, JUSTIFY_CENTER_X, LAYOUT_FILL_X);
 	gridSizeSlider = new FXSlider(LeftPanel, this, ID_GRIDSIZE, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0);
 	gridSizeSlider->setRange(1, 6);
@@ -200,7 +207,12 @@ void configurePlaceableComboBox(FXComboBox *comboBox) {
 	comboBox->appendItem("Interior Wall");
 	comboBox->appendItem("Exterior Wall");
 	comboBox->appendItem("Cabinet");
-	comboBox->setNumVisible(3);
+	comboBox->appendItem("Prefab: Door - Left");
+	comboBox->appendItem("Prefab: Door - Right");
+	comboBox->appendItem("Prefab: Door - Sink");
+	comboBox->appendItem("Prefab: Door - Stove");
+	comboBox->appendItem("Prefab: Door - Corner");
+	comboBox->setNumVisible(8);
 }
 
 ProjectWindow::~ProjectWindow() {
@@ -229,6 +241,21 @@ long ProjectWindow::onCmdNewPlacable(FXObject*, FXSelector, void*) {
 		break;
 	case 2:
 		project->addPlaceable(project->get_gridSize(), project->get_gridSize(), 384, 480); // standard 24" by 30" cabinet
+		break;
+	case 3:
+		project->addPlaceable(true, 0, project->get_gridSize(), project->get_gridSize()); // Left-Swing Door
+		break;
+	case 4:
+		project->addPlaceable(true, 1, project->get_gridSize(), project->get_gridSize()); // Right-Swing Door
+		break;
+	case 5:
+		project->addPlaceable(true, 2, project->get_gridSize(), project->get_gridSize()); // Sink Cabinet
+		break;
+	case 6:
+		project->addPlaceable(true, 3, project->get_gridSize(), project->get_gridSize()); // Stove
+		break;
+	case 7:
+		project->addPlaceable(true, 4, project->get_gridSize(), project->get_gridSize()); // Corner Cabinet
 		break;
 	default:
 		break;
@@ -261,7 +288,14 @@ void ProjectWindow::drawScreen()
 
 	//draw placeables
 	for (int i = 0; i < project->get_placeableCount(); i++) {
-		project->placeables[i]->draw(&dc, project->get_gridSize());
+		if (project->placeables[i]->get_prefab() == false) {
+			project->placeables[i]->draw(&dc, project->get_gridSize());
+		}
+		else {
+			project->placeables[i]->drawPrefab(&dc, project->get_gridSize());
+		}
+		
+
 	}
 	if(currentSelection != NULL)
 		drawControlHandles();
@@ -408,8 +442,10 @@ long ProjectWindow::deselect() {
 	angleText->setText("");
 	widthFraction->setCurrentItem(0);
 	heightFraction->setCurrentItem(0);
+	cabinet->setText("");
 	return 1;
 }
+
 
 // The mouse button was released again
 long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
@@ -460,12 +496,12 @@ void ProjectWindow::displayUnits() {
 	widthFraction->setCurrentItem(currentSelection->get_width() % 16);
 	// Set Inches for height
 	heightText->setText(FXStringVal(currentSelection->get_height() / 16));
-	heightFraction->setCurrentItem(currentSelection->get_height() % 16);
 	// Set Fraction for Height
-
+	heightFraction->setCurrentItem(currentSelection->get_height() % 16);
 	// No changes needed to angle
 	angleText->setText(FXStringVal(currentSelection->get_angle()));
-
+	// display Name
+	cabinet->setText(currentSelection->get_name());
 
 }
 
@@ -632,17 +668,21 @@ long ProjectWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 //Update Cabinet Specifications
 // Change Grid Size With Slider
 long ProjectWindow::onCmdUpdateSpecs(FXObject*, FXSelector, void*) {
-	FXint w, h;
-	h = (FXIntVal(heightText->getText()) * 16) + heightFraction->getCurrentItem();
-	w = (FXIntVal(widthText->getText()) * 16) + widthFraction->getCurrentItem();
-	currentSelection->set_height(h);
+	if (currentSelection != NULL) {
+		FXint w, h;
+		h = (FXIntVal(heightText->getText()) * 16) + heightFraction->getCurrentItem();
+		w = (FXIntVal(widthText->getText()) * 16) + widthFraction->getCurrentItem();
+		currentSelection->set_height(h);
 
-	currentSelection->set_width(w);
+		currentSelection->set_width(w);
 
-	currentSelection->set_angle(FXIntVal(angleText->getText()));
-
-	drawScreen();
-
+		currentSelection->set_angle(FXIntVal(angleText->getText()));
+		currentSelection->set_name(cabinet->getText());
+		drawScreen();
+	}
+	else {
+		deselect();
+	}
 	return 1;
 }
 // Change Grid Size With Slider

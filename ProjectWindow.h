@@ -34,8 +34,8 @@ private:
 	FXTextField       *widthText;
 	FXComboBox		  *widthFraction;
 
-	FXHorizontalFrame *cabinetFrame;
-	FXText          *cabinet;                 //cabinet test
+	FXVerticalFrame  *cabinetFrame;
+	FXTextField       *cabinet;                 //cabinet test
 
 	FXHorizontalFrame *unitsFrame;              // units frame of the data panel
 	FXRadioButton     *feetRadio;
@@ -62,6 +62,7 @@ private:
 	FXColor			   placeableColor;			// Color for placeables
 	FXHorizontalFrame *angleFrame;              //frame to hold the angle data text box and label
 	FXTextField		  *angleText;               //the angle of the placeable
+
 
 
 	int itemClicked;
