@@ -470,7 +470,7 @@ void ProjectWindow::drawControlHandles()
 	FXDCWindow dc(canvas);
 	currentSelection->drawControlHandles(&dc);
 
-	
+	/*
 	dc.setForeground(FXRGB(209, 0, 209));
 	FXRectangle* r = project->placeables[currentIndex]->get_rectangle();
 	dc.drawRectangle(r->x - 10,
@@ -489,7 +489,7 @@ void ProjectWindow::drawControlHandles()
 		r->y - 10,
 		10,
 		r->h + 20);
-	
+	*/
 	
 
 }

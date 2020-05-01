@@ -245,8 +245,8 @@ FXint Placeable::scale(FXint x) {
 }
 bool Placeable::isClicked(int clickX, int clickY, FXDCWindow *dc)
 {
-	dc->setForeground(FXRGB(255, 0, 0));
-	dc->drawEllipse(clickX, clickY, 5, 5);
+	//dc->setForeground(FXRGB(255, 0, 0));
+	//dc->drawEllipse(clickX, clickY, 5, 5);
 	//rotate click to match rectangle
 	int tempX, tempY, rotatedX, rotatedY;
 	FXPoint center = FXPoint(rectangle->x + rectangle->w * .5, rectangle->y + rectangle->h * .5);
@@ -263,8 +263,8 @@ bool Placeable::isClicked(int clickX, int clickY, FXDCWindow *dc)
 		clickX = rotatedX + center.x;
 		clickY = rotatedY + center.y;
 
-		dc->setForeground(FXRGB(0, 255, 0));
-		dc->drawEllipse(clickX, clickY, 5, 5);
+		//dc->setForeground(FXRGB(0, 255, 0));
+		//dc->drawEllipse(clickX, clickY, 5, 5);
 	if (rectangle->contains(clickX, clickY))
 		return true;
 
@@ -283,8 +283,8 @@ void Placeable::draw(FXDCWindow* dc, int grid)
 	dc->drawLine(scale(p[3].x), scale(p[3].y), scale(p[0].x), scale(p[0].y));
 
 
-	dc->setForeground(FXRGB(0, 209, 209));
-	dc->drawRectangle(rectangle->x, rectangle->y, rectangle->w, rectangle->h);
+	//dc->setForeground(FXRGB(0, 209, 209));
+	//dc->drawRectangle(rectangle->x, rectangle->y, rectangle->w, rectangle->h);
 
 
 }
