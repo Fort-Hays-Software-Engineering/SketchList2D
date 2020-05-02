@@ -15,6 +15,7 @@ private:
 	int s7;							// placeholder variable for another specification
 	FXRectangle* rectangle;         // The unrotated rectangle for the placeale
 	FXPoint p[4];                   // the points of the rotated rectangle
+	FXPoint pfp[4];                 // the points of the prefab additions
 	
 	FXint curgrid;					// current grid for scaling
 	void updatePoints();

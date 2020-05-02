@@ -334,9 +334,10 @@ void Placeable::drawPrefab(FXDCWindow* dc, int grid) {
 	
 	// Set divisor to determine how much each 10px x 10x grid square represents
 	curgrid = grid;
-	int c[4], cw, ch;
-
-
+	int c[4], cw, ch, cOffset;
+	int tempX, tempY, rotatedX, rotatedY;
+	//the coordinates for the center of the square
+	FXPoint center = FXPoint(scale(xPos + width * .5), scale(yPos + height * .5));
 
 	
 	// Prefab Types
@@ -356,57 +357,90 @@ void Placeable::drawPrefab(FXDCWindow* dc, int grid) {
 		dc->setForeground(FXRGB(0, 0, 0));
 		break;
 	case 2: // sink cabinet
-		int sx, sy, sw, sh;
+		int sw, sh;
 		sw = scale(width) *.5;
 		sh = scale(height) *.75;
-		sx = scale(xPos) + (scale(width) * .25);
-		sy = scale(yPos) + (scale(height) * .125);
+		pfp[0].x = pfp[3].x = scale(xPos) + (scale(width) * .25);
+		pfp[0].y = pfp[1].y = scale(yPos) + (scale(height) * .125);
+		pfp[1].x = pfp[2].x = (scale(xPos) + (scale(width) * .25) + sw);
+		pfp[2].y = pfp[3].y = (scale(yPos) + (scale(height) * .125) + sh);
+
+
+		//rotate each point
+		for (int i = 0; i < 4; i++) {
+			//translate to origin
+			tempX = pfp[i].x - center.x;
+			tempY = pfp[i].y - center.y;
+
+			//rotate
+			rotatedX = tempX * cos(angle * PI / 180) - tempY * sin(angle * PI / 180);
+			rotatedY = tempX * sin(angle * PI / 180) + tempY * cos(angle * PI / 180);
+
+			//translate back to original position
+			pfp[i].x = rotatedX + center.x;
+			pfp[i].y = rotatedY + center.y;
+		}
 
 		//draw lines betweeen each point to form a rectangle
 		dc->drawLine(scale(p[0].x), scale(p[0].y), scale(p[1].x), scale(p[1].y));
 		dc->drawLine(scale(p[1].x), scale(p[1].y), scale(p[2].x), scale(p[2].y));
 		dc->drawLine(scale(p[2].x), scale(p[2].y), scale(p[3].x), scale(p[3].y));
 		dc->drawLine(scale(p[3].x), scale(p[3].y), scale(p[0].x), scale(p[0].y));
-		dc->drawRoundRectangle(sx, sy, sw, sh, sw*.25, sh*.25);
+		// draw sink
+		dc->drawLine(pfp[0].x, pfp[0].y, pfp[1].x, pfp[1].y);
+		dc->drawLine(pfp[1].x, pfp[1].y, pfp[2].x, pfp[2].y);
+		dc->drawLine(pfp[2].x, pfp[2].y, pfp[3].x, pfp[3].y);
+		dc->drawLine(pfp[3].x, pfp[3].y, pfp[0].x, pfp[0].y);
+
 		break;
+
+
 	case 3: // stove
 		
 		cw = scale(width) * .25;
 		ch = scale(height) * .25;
-		c[0] = scale(xPos) + (scale(width) * .13);
-		c[1] = scale(yPos) + (scale(height) * .25);
-		c[2] = scale(xPos) + (scale(width) * .6);
-		c[3] = scale(yPos) + (scale(height) * .6);
+		cOffset = ch * .5;
+		pfp[0].x = pfp[2].x = scale(xPos) + (scale(width) * .3);
+		pfp[0].y = pfp[1].y = scale(yPos) + (scale(height) * .3);
+		pfp[1].x = pfp[3].x = scale(xPos) + (scale(width) * .7);
+		pfp[2].y = pfp[3].y = scale(yPos) + (scale(height) * .7);
+		
+
+
+
+		//rotate each point
+		for (int i = 0; i < 4; i++) {
+			//translate to origin
+			tempX = pfp[i].x - center.x;
+			tempY = pfp[i].y - center.y;
+
+			//rotate
+			rotatedX = tempX * cos(angle * PI / 180) - tempY * sin(angle * PI / 180);
+			rotatedY = tempX * sin(angle * PI / 180) + tempY * cos(angle * PI / 180);
+
+			//translate back to original position
+			pfp[i].x = rotatedX + center.x;
+			pfp[i].y = rotatedY + center.y;
+		}
 
 		//draw lines betweeen each point to form a rectangle
 		dc->drawLine(scale(p[0].x), scale(p[0].y), scale(p[1].x), scale(p[1].y));
 		dc->drawLine(scale(p[1].x), scale(p[1].y), scale(p[2].x), scale(p[2].y));
 		dc->drawLine(scale(p[2].x), scale(p[2].y), scale(p[3].x), scale(p[3].y));
 		dc->drawLine(scale(p[3].x), scale(p[3].y), scale(p[0].x), scale(p[0].y));
-		dc->drawEllipse(c[0], c[1], cw, ch);
-		dc->drawEllipse(c[2], c[1], cw, ch);
-		dc->drawEllipse(c[0], c[3], cw, ch);
-		dc->drawEllipse(c[2], c[3], cw, ch);
-		break;
-	case 4: // corner cabinet
-		cw = scale(width) * .25;
-		ch = scale(height) * .25;
-		c[0] = scale(xPos) + (scale(width) * .333);
-		c[1] = scale(yPos) + (scale(height) * .667);
+		dc->drawEllipse(pfp[0].x - cOffset, pfp[0].y - cOffset, cw, ch);
+		dc->drawEllipse(pfp[1].x - cOffset, pfp[1].y - cOffset, cw, ch);
+		dc->drawEllipse(pfp[2].x - cOffset, pfp[2].y - cOffset, cw, ch);
+		dc->drawEllipse(pfp[3].x - cOffset, pfp[3].y - cOffset, cw, ch);
 
-
-		//draw lines betweeen each point to form a rectangle
-		dc->drawLine(scale(p[0].x), scale(p[0].y), scale(p[1].x), scale(p[1].y));
-		dc->drawLine(scale(p[1].x), scale(p[1].y), scale(p[2].x), scale(p[2].y));
-		dc->drawLine(scale(p[2].x), scale(p[2].y), c[0], scale(p[2].y));
-		dc->drawLine(scale(p[0].x), scale(p[0].y), scale(p[0].x), c[1]);
-		dc->drawLine(scale(p[0].x), c[1], c[0], scale(p[3].y));
 
 		break;
+
 	default:
 		break;
 
 	}
+
 }
 
 Wall::Wall(bool interior) {

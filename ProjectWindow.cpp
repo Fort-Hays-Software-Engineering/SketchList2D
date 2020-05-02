@@ -213,8 +213,7 @@ void configurePlaceableComboBox(FXComboBox *comboBox) {
 	comboBox->appendItem("Prefab: Door - Right");
 	comboBox->appendItem("Prefab: Door - Sink");
 	comboBox->appendItem("Prefab: Door - Stove");
-	comboBox->appendItem("Prefab: Door - Corner");
-	comboBox->setNumVisible(8);
+	comboBox->setNumVisible(7);
 }
 
 ProjectWindow::~ProjectWindow() {
@@ -255,9 +254,6 @@ long ProjectWindow::onCmdNewPlacable(FXObject*, FXSelector, void*) {
 		break;
 	case 6:
 		project->addPlaceable(true, 3, project->get_gridSize(), project->get_gridSize()); // Stove
-		break;
-	case 7:
-		project->addPlaceable(true, 4, project->get_gridSize(), project->get_gridSize()); // Corner Cabinet
 		break;
 	default:
 		break;
