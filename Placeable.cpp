@@ -173,6 +173,15 @@ Placeable::Placeable(bool prefab, int type, int x, int y, int a) {
 
 }
 
+Placeable::Placeable(int clickX, int clickY, FXDCWindow* dc)
+{
+	if (isDoor == true)
+	{
+		dc->setForeground(FXRGB(255, 0, 0));
+		dc->drawEllipse(100, 100, 100, 100);
+	}
+}
+
 FXRectangle * Placeable::get_rectangle()
 {
 	return rectangle;

@@ -30,6 +30,7 @@ public:
 	Placeable(int x, int y, int h, int w, int a);
 	Placeable(int x, int y, int h, int w, int a, int grid);
 	Placeable(int x, int y, int h, int w, int a, int g, FXString n);
+	Placeable(int clickX, int clickY, FXDCWindow* dc);
 	FXRectangle* get_rectangle();
 	void set_xPos(int newX);
 	void set_yPos(int newY);
