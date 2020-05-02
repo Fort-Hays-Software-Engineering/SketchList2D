@@ -53,6 +53,7 @@ public:
 	void draw(FXDCWindow* dc, int grid);
 	void drawPrefab(FXDCWindow* dc, int grid);              // draw extra prefab features
 	void drawControlHandles(FXDCWindow* dc);
+	bool checkDoor(int radius, int x_center, int y_center, FXPoint* r);
 
 	FXDataTarget	   heightTarget;			// Data target for height box
 	FXDataTarget	   widthTarget;			    // Data target for width box

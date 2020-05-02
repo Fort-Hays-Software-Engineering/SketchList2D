@@ -354,6 +354,34 @@ void Placeable::drawControlHandles(FXDCWindow * dc)
 	dc->drawLine(select[3].x, select[3].y, select[0].x, select[0].y);
 }
 
+bool Placeable::checkDoor(int radius, int x_center, int y_center, FXPoint* r)
+{
+	//a circle overlaps a rectangle if the distance from the center of the circle
+	//is less than the radius of the circle
+	// https://www.geeksforgeeks.org/program-calculate-distance-two-points/
+	int dist;
+	for (int i = 0; i < 4; i++) {
+		dist = sqrt(pow(r[i].x - x_center, 2) + pow(r[i].y - y_center, 2) * 1.0);
+		if (dist < radius) return false;
+
+	}
+
+	//or if the radius is less than the distance to one of the sides
+	//https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
+	//line between
+	int p;
+	for (int i = 0; i < 4; i++) {
+		p = i + 1;
+		if (p == 4) p = 0;
+		dist = abs((r[p].y - r[i].y)*x_center - (r[p].x - r[i].x)*y_center + r[p].x*r[i].y - r[p].y*r[i].x) /
+			sqrt(pow((r[p].y - r[i].y), 2) + pow(r[p].x - r[i].x, 2));
+		if (dist < radius) return false;
+	}
+	
+
+	return true;
+}
+
 void Placeable::save(FXStream& stream)
 {
 
