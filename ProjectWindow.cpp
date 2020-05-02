@@ -27,6 +27,7 @@ FXDEFMAP(ProjectWindow) ProjectWindowMap[] = {
 	FXMAPFUNC(SEL_COMMAND,			 ProjectWindow::ID_GRIDSIZE,		ProjectWindow::onCmdGridSize),
 	FXMAPFUNC(SEL_COMMAND,			 ProjectWindow::ID_UPDATESPECS,		ProjectWindow::onCmdUpdateSpecs),
     FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_PRINT,			ProjectWindow::onCmdPrint),
+	FXMAPFUNC(SEL_COMMAND,           ProjectWindow::ID_VIEWBOM,			ProjectWindow::onCmdViewBom),
 
 };
 
@@ -683,6 +684,15 @@ long ProjectWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
 	isSplashScreen = 0;
 	ProjectWindow *window = new ProjectWindow(getApp());
 	window->isSplashScreen = 0;
+	window->create();
+	window->raise();
+	window->setFocus();
+	return 1;
+}
+
+long ProjectWindow::onCmdViewBom(FXObject*, FXSelector, void*) {
+	isSplashScreen = 0;
+	BomWindow *window = new BomWindow(getApp());
 	window->create();
 	window->raise();
 	window->setFocus();
