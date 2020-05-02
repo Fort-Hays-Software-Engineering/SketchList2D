@@ -81,6 +81,8 @@ private:
 	void updateCursor(int x, int y);
 	void resize(int lastX, int curX, int lastY, int curY);
 	FXPoint rotateClick(FXPoint click, FXPoint center, int angle);
+
+	void checkForErrors();
 	// Scale coordinate to grid Size
 
 

@@ -455,7 +455,7 @@ long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
 	FXEvent *ev = (FXEvent*)ptr;
 	canvas->ungrab();
 	if (mdflag) {
-
+		checkForErrors();
 		// Mouse no longer down
 		xDrag = 0;
 		yDrag = 0;
@@ -655,6 +655,21 @@ FXPoint ProjectWindow::rotateClick(FXPoint click, FXPoint center, int angle)
 	click.x = rotatedX + center.x;
 	click.y = rotatedY + center.y;
 	return FXPoint(click.x, click.y);
+}
+
+void ProjectWindow::checkForErrors()
+{
+	if (currentSelection == NULL)
+		return;
+	for (int i = 0; i < project->get_placeableCount(); i++) {
+		if (i == currentIndex) continue;
+		if (currentSelection->get_xPos() == project->placeables[i]->get_xPos() && currentSelection->get_yPos() == project->placeables[i]->get_yPos()) {
+			FXMessageBox* b = new FXMessageBox(getApp(), "Error!", "Objects overlapping.");
+			b->error(getApp(), FX::MBOX_OK, "Error!", "Objects overlapping.");
+			break;
+		}
+	}
+	
 }
 
 // Paint the canvas

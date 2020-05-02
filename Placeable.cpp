@@ -362,8 +362,10 @@ bool Placeable::checkDoor(int radius, int x_center, int y_center, FXPoint* r)
 	int dist;
 	for (int i = 0; i < 4; i++) {
 		dist = sqrt(pow(r[i].x - x_center, 2) + pow(r[i].y - y_center, 2) * 1.0);
-		if (dist < radius) return false;
-
+		if (dist < radius) {
+			FXDialogBox(newWindow, "Error!", 2, 10, 10, 10, 10, 10, 10, 10, 10, 4, 4);
+			return false;
+		}
 	}
 
 	//or if the radius is less than the distance to one of the sides
@@ -375,7 +377,10 @@ bool Placeable::checkDoor(int radius, int x_center, int y_center, FXPoint* r)
 		if (p == 4) p = 0;
 		dist = abs((r[p].y - r[i].y)*x_center - (r[p].x - r[i].x)*y_center + r[p].x*r[i].y - r[p].y*r[i].x) /
 			sqrt(pow((r[p].y - r[i].y), 2) + pow(r[p].x - r[i].x, 2));
-		if (dist < radius) return false;
+		if (dist < radius) {
+			FXDialogBox(newWindow, "Error!", 0, 0, 0, 0, 0, 10, 10, 10, 10, 4, 4);
+			return false;
+		}
 	}
 	
 
