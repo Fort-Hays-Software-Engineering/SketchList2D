@@ -38,6 +38,7 @@ Placeable::Placeable()
 	curgrid = 1;
 	name = "";
 	isPrefab = false;
+	prefabType = NULL;
 
 	p[0] = FXPoint(xPos, yPos);
 	p[1] = FXPoint(xPos + width, yPos);
@@ -53,10 +54,12 @@ Placeable::Placeable(int x, int y, int h, int w)
 	height = h;
 	width = w;
 	angle = 0;
-	rectangle = new FXRectangle(x, y, scale(w), scale(h));
 	curgrid = 1;
+	rectangle = new FXRectangle(x, y, scale(w), scale(h));
+
 	name = "";
 	isPrefab = false;
+	prefabType = NULL;
 
 	p[0] = FXPoint(xPos, yPos);
 	p[1] = FXPoint(xPos + width, yPos);
@@ -71,11 +74,29 @@ Placeable::Placeable(int x, int y, int h, int w, int a)
 	height = h;
 	width = w;
 	angle = a;
+	curgrid = 1;
 	rectangle = new FXRectangle(x, y, scale(w), scale(h));
 	updatePoints();
-	curgrid = 1;
+
 	name = "";
 	isPrefab = false;
+	prefabType = NULL;
+}
+
+Placeable::Placeable(int x, int y, int h, int w, int a, int g, FXString n)
+{
+	xPos = x;
+	yPos = y;
+	height = h;
+	width = w;
+	angle = a;
+	curgrid = g;
+	rectangle = new FXRectangle(x, y, scale(w), scale(h));
+	updatePoints();
+
+	name = n;
+	isPrefab = false;
+	prefabType = NULL;
 }
 
 Placeable::Placeable(int x, int y, int h, int w, int a, int grid) {
@@ -87,7 +108,7 @@ Placeable::Placeable(int x, int y, int h, int w, int a, int grid) {
 	curgrid = grid;
 	isPrefab = false;
 	rectangle = new FXRectangle(scale(x), scale(y), scale(w), scale(h));
-
+	prefabType = NULL;
 
 	p[0] = FXPoint(xPos, yPos);
 	p[1] = FXPoint(xPos + width, yPos);
@@ -96,11 +117,11 @@ Placeable::Placeable(int x, int y, int h, int w, int a, int grid) {
 }
 
 //Prefab Constructor
-Placeable::Placeable(bool prefab, int type, int x, int y) {
+Placeable::Placeable(bool prefab, int type, int x, int y, int a) {
 	xPos = x;
 	yPos = y;
 	isPrefab = true;
-	curgrid = x;
+	curgrid = 1;
 	prefabType = type;
 	// Prefab Types
 	switch (type) {
@@ -139,7 +160,7 @@ Placeable::Placeable(bool prefab, int type, int x, int y) {
 
 	}
 
-	angle = 0;
+	angle = a;
 	rectangle = new FXRectangle(x, y, scale(width), scale(height));
 	curgrid = 1;
 
@@ -327,7 +348,7 @@ void Placeable::drawControlHandles(FXDCWindow * dc)
 void Placeable::save(FXStream& stream)
 {
 
-	stream << xPos << yPos << height << width << NULL << angle << s6 << s7;        
+	stream << xPos << yPos << height << width << NULL << angle << isPrefab << prefabType << name;        
 }
 
 void Placeable::drawPrefab(FXDCWindow* dc, int grid) {

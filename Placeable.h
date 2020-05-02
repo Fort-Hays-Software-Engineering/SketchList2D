@@ -11,8 +11,6 @@ private:
 	int width;						// Width variable
 	int v;							// Version variable, used to determine save file type
 	int angle;						// Angle variable
-	int s6;							// placeholder variable for another specification
-	int s7;							// placeholder variable for another specification
 	FXRectangle* rectangle;         // The unrotated rectangle for the placeale
 	FXPoint p[4];                   // the points of the rotated rectangle
 	FXPoint pfp[4];                 // the points of the prefab additions
@@ -28,9 +26,10 @@ private:
 public:
 	Placeable();
 	Placeable(int x, int y, int h, int w);
-	Placeable(bool isPrefab, int type, int x, int y);
+	Placeable(bool isPrefab, int type, int x, int y, int a);
 	Placeable(int x, int y, int h, int w, int a);
 	Placeable(int x, int y, int h, int w, int a, int grid);
+	Placeable(int x, int y, int h, int w, int a, int g, FXString n);
 	FXRectangle* get_rectangle();
 	void set_xPos(int newX);
 	void set_yPos(int newY);

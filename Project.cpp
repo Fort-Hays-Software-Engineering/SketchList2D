@@ -40,7 +40,9 @@ void Project::save(FXStream& stream)
 
 void Project::load(FXStream& stream)
 {
-	FXint x, y, h, w, a, v, s6, s7;
+	FXint x, y, h, w, a, v, prefabType;
+	FXbool isPrefab;
+	FXString name;
 	// Load Project from stream
 	
 	stream >> gridSize;
@@ -49,23 +51,24 @@ void Project::load(FXStream& stream)
 	// load placeables
 	for (int i = 0; i < placeableCount; i++) {
 		
-		stream >> x >> y >> h >> w >> v >> a >> s6 >> s7;
+		stream >> x >> y >> h >> w >> v >> a >> isPrefab >> prefabType >> name;
 		// If version variable is null, the project was saved with an angle
 		if (v == NULL) {
-			placeables[i] = new Placeable(x, y, h, w, a);
+			if (isPrefab == 1) {
+				placeables[i] = new Placeable(true, prefabType, x, y, 0);
+				placeables[i]->set_curgrid(gridSize);
+				placeables[i]->set_width(w);
+				placeables[i]->set_height(h);
+				placeables[i]->set_angle(a);
+			}
+			else {
+				placeables[i] = new Placeable(x, y, h, w, a, gridSize, name);
+			}
+			
 			
 		}
-		else {
-		// If version variable is not null, build cabinets with no angles or extra specs.
-			placeables[i] = new Placeable(x, y, h, w);
-			// previous version means that two cabinets were loaded, if all variables were loaded successfully, add the next cabinet and increment i 
-			if (v && a && s6 && s7) {
-				placeables[++i] = new Placeable(v, a, s6, s7);
-				
-			}
 
-		}
-		x = y = h = w = v = a = s6 = s7 = NULL;
+		x = y = h = w = v = a = isPrefab = prefabType = NULL;
 		
 	}
 }
@@ -78,7 +81,7 @@ void Project::addPlaceable(int x, int y, int h, int w)
 
 void Project::addPlaceable(bool, int type, int x, int y)
 {
-	placeables[placeableCount] = new Placeable(true, type, x, y);
+	placeables[placeableCount] = new Placeable(true, type, x, y, 0);
 	placeableCount++;
 }
 
