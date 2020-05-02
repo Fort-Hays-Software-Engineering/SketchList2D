@@ -4,10 +4,11 @@
 *                                                                               *
 ********************************************************************************/
 #ifndef BomWindow_H
-
+#define BomWindow_H
 #include "fx.h"
 #include "Project.h";
 #include "Placeable.h"
+#include "ProjectWindow.h"
 
 
 class NewWindow;

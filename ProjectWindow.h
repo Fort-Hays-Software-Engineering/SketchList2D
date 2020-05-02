@@ -4,6 +4,7 @@
 *                                                                               *
 ********************************************************************************/
 #ifndef ProjectWindow_H
+#define ProjectWindow_H
 
 #include "fx.h"
 #include "Project.h";
@@ -132,6 +133,8 @@ public:
 	long onCmdGridSize(FXObject*, FXSelector, void*);
 	long onCmdUpdateSpecs(FXObject*, FXSelector, void*);
 	long deselect();
+
+	Project* getProject();
 
 public:
 

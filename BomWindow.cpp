@@ -75,6 +75,7 @@ BomWindow::BomWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Designer", N
 	// Recent files
 	mrufiles.setTarget(this);
 	mrufiles.setSelector(ID_OPEN_RECENT);
+
 }
 
 
@@ -97,7 +98,8 @@ void BomWindow::create() {
 // Paint the canvas
 long BomWindow::onPaint(FXObject*, FXSelector, void* ptr) {
 
-
+	ProjectWindow* par = (ProjectWindow*) getParent();
+	project = par->getProject();
 	return 1;
 }
 // New

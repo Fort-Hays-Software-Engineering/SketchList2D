@@ -444,6 +444,11 @@ long ProjectWindow::deselect() {
 	return 1;
 }
 
+Project* ProjectWindow::getProject()
+{
+	return project;
+}
+
 
 // The mouse button was released again
 long ProjectWindow::onMouseUp(FXObject*, FXSelector, void* ptr) {
