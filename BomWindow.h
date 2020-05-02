@@ -79,6 +79,7 @@ public:
 	long onCmdSaveAs(FXObject*, FXSelector, void*);
 	long onCmdOpenRecent(FXObject*, FXSelector, void* ptr);
 	long onCmdPrint(FXObject*, FXSelector, void*);
+	long configureTable();
 
 	//create a new project
 	long onCmdNewProject(FXObject*, FXSelector, void*);
@@ -135,5 +136,5 @@ public:
 };
 
 void configurePlaceableComboBox(FXComboBox *comboBox);
-void configureFractionComboBox(FXComboBox *box);
+
 #endif // !BomWindow_H

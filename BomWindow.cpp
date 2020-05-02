@@ -13,8 +13,6 @@ FXDEFMAP(BomWindow) BomWindowMap[] = {
 
 	//________Message_Type_____________________ID____________Message_Handler_______
 	FXMAPFUNC(SEL_PAINT,             BomWindow::ID_CANVAS,			BomWindow::onPaint),
-	FXMAPFUNC(SEL_COMMAND,           BomWindow::ID_OPEN,			BomWindow::onCmdOpen),
-	FXMAPFUNC(SEL_COMMAND,           BomWindow::ID_OPEN_RECENT,		BomWindow::onCmdOpenRecent),
 	FXMAPFUNC(SEL_COMMAND,           BomWindow::ID_SAVE,			BomWindow::onCmdSave),
 	FXMAPFUNC(SEL_COMMAND,           BomWindow::ID_SAVEAS,			BomWindow::onCmdSaveAs),
 	FXMAPFUNC(SEL_COMMAND,           BomWindow::ID_PRINT,			BomWindow::onCmdPrint),
@@ -35,13 +33,14 @@ BomWindow::BomWindow(FXApp *a) :FXMainWindow(a, "SketchList 2D Room Designer", N
 	//getApp()->windowlist.append(this);
 	project = new Project;
 
+
 	topdock = new FXDockSite(this, LAYOUT_SIDE_TOP | LAYOUT_FILL_X);
 	// Make menu bar
 	menubar = new FXMenuBar(topdock, LAYOUT_DOCK_NEXT | LAYOUT_SIDE_TOP | LAYOUT_FILL_X | FRAME_RAISED);
 
 	contents = new FXHorizontalFrame(this, LAYOUT_SIDE_TOP | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 	table = new FXTable(contents, NULL, NULL, LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
-	
+	configureTable();
 
 
 
@@ -97,28 +96,28 @@ void BomWindow::create() {
 
 // Paint the canvas
 long BomWindow::onPaint(FXObject*, FXSelector, void* ptr) {
-
-	ProjectWindow* par = (ProjectWindow*) getParent();
+	
+	ProjectWindow* par = (ProjectWindow*)getParent();
 	project = par->getProject();
-	return 1;
-}
-// New
-long BomWindow::onCmdNew(FXObject*, FXSelector, void*) {
-	BomWindow *window = new BomWindow(getApp());
-	window->create();
-	window->raise();
-	window->setFocus();
+	
 	return 1;
 }
 
-long BomWindow::onCmdNewProject(FXObject*, FXSelector, void*) {
-	//redraw screen with isSplashScreen = 0
-	//isSplashScreen = 0;
-	BomWindow *window = new BomWindow(getApp());
-	//window->isSplashScreen = 0;
-	window->create();
-	window->raise();
-	window->setFocus();
+
+long BomWindow::configureTable() {
+	table->insertColumns(0, 3);
+	table->setColumnWidth(0, 100);
+	table->setColumnWidth(1, 200);
+	table->setColumnWidth(2, 300);
+	table->setColumnText(0, "Item Number");
+	table->setColumnText(1, "Item Name");
+	table->setColumnText(2, "Find it Online");
+	table->insertRows(0, 20);
+	table->showHorzGrid();
+	table->showVertGrid();
+	for (int i = 0; i < 3; i++) {
+		
+	}
 	return 1;
 }
 
@@ -192,61 +191,6 @@ FXbool BomWindow::saveFile(const FXString& file) {
 	return TRUE;
 }
 
-// Open project file
-long BomWindow::onCmdOpen(FXObject*, FXSelector, void*) {
-	FXFileDialog opendialog(this, tr("Open Document"));
-	opendialog.setSelectMode(SELECTFILE_EXISTING);
-	opendialog.setPatternList("Project Files(*.pjt)\nAll Files (*)");
-	opendialog.setCurrentPattern(0);
-	opendialog.setDirectory(FXPath::directory(filename));
-	if (opendialog.execute()) {
-		BomWindow *window = new BomWindow(getApp());
-		FXString file = opendialog.getFilename();
-		window->create();
-		window->loadFile(file);
-		window->raise();
-		window->setFocus();
-
-	}
-	return 1;
-}
-
-// Load project file
-FXbool BomWindow::loadFile(const FXString& file) {
-	FXFileStream  stream;
-	FXTRACE((100, "loadFile(%s)\n", file.text()));
-	// Opened file?
-	if (!stream.open(file, FXStreamLoad)) {
-		FXMessageBox::error(this, MBOX_OK, tr("Error Saving Project File"), tr("Unable to open file: %s"), file.text());
-		return FALSE;
-	}
-	// Set wait cursor
-	getApp()->beginWaitCursor();
-	//project->load(stream);
-	// Save project data to the file
-	project->load(stream);
-	// Kill wait cursor
-	getApp()->endWaitCursor();
-	// Set stuff
-	mrufiles.appendFile(file);
-	filetime = FXStat::modified(file);
-	filenameset = TRUE;
-	filename = file;
-	setTitle("SketchList 2D Room Designer - " + file);
-	getApp()->reg().write();
-	return TRUE;
-}
-
-// Open recent file
-long BomWindow::onCmdOpenRecent(FXObject*, FXSelector, void* ptr) {
-	FXString file = (const char*)ptr;
-	BomWindow *window = new BomWindow(getApp());
-	window->create();
-	window->loadFile(file);
-	window->raise();
-	window->setFocus();
-	return 1;
-}
 
 
 
